@@ -13,7 +13,10 @@ def main():
     # Get current image filename
     imp = IJ.getImage()
     f = imp.getOriginalFileInfo()
-    fname = os.path.join(f.directory, f.fileName)
+    
+    if not f:
+        IJ.showMessage('Source image needs to match a file on the system.')
+        return
 
     # Iterate over all ROIs from ROI Manager
     rois = RoiManager.getInstance()
@@ -22,12 +25,14 @@ def main():
         IJ.showMessage('No ROIs. Please use Analyze > Tools > ROI Manager...')
         return
 
+    fname = os.path.join(f.directory, f.fileName)
     IJ.log('Image filename is %s' % fname)
-    
-    for i, roi in enumerate(rois.getRoisAsArray()):
+
+    rois_array = rois.getRoisAsArray()
+    for i, roi in enumerate(rois_array):
     
         crop_id = i +1
-        IJ.log("Opening crop %i / %i" % (crop_id, len(rois)))
+        IJ.log("Opening crop %i / %i" % (crop_id, len(rois_array)))
     
         # Get ROI bounds
         bounds = roi.getBounds()
@@ -45,7 +50,7 @@ def main():
         opener = ImgOpener()
         imps = opener.openImgs(fname, config)
         imp = imps[0]
-    
+        
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, f.fileName)
         crop_fname = os.path.join(f.directory, crop_basename)
