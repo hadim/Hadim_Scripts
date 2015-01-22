@@ -10,9 +10,17 @@ Use it, hack it, share it.
 sh install.sh /path/to/fiji/Fiji.app
 ```
 
-## Use
+## Usage
 
+### Scripts
 
+- Crop_Multi_Roi.py : auto crop and save ROIs in an opened image.
+- Get_OME_String.py : display OME string of an OME Tiff file.
+- Kymograph.py : work in progress
+
+### Macros
+
+See [custom-macros.ijm](/macros/AutoInstall/custom-macros.ijm).
 
 # License
 
