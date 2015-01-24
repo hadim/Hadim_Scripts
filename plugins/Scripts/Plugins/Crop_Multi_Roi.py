@@ -6,6 +6,7 @@ from io.scif.img import ImageRegion
 from io.scif.img import ImgOpener
 from io.scif.img import ImgSaver
 from net.imagej.axis import Axes
+from net.imglib2.img.display.imagej import ImageJFunctions
 
 import os
 
@@ -54,11 +55,15 @@ def main():
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, f.fileName)
         crop_fname = os.path.join(f.directory, crop_basename)
-        IJ.log("Saving crop to %s" % crop_fname)
+        imp.setName(crop_basename)
     
         # Save cropped image
-        saver = ImgSaver()
-        saver.saveImg(crop_fname, imp)
+        #IJ.log("Saving crop to %s" % crop_fname)
+        #saver = ImgSaver()
+        #saver.saveImg(crop_fname, imp)
+
+        # Show cropped image
+        ImageJFunctions.show(imp)
     
     IJ.log('Done')
 
