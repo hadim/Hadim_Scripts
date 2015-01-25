@@ -1,5 +1,6 @@
 setBatchMode(true);
 run("Bio-Formats Macro Extensions");
+setBigTiff(true);
 
 input = getArgument();
 
@@ -27,7 +28,11 @@ function processFile(input, file) {
     open(input + file);
     run("Z Project...", "projection=[Max Intensity] all");
     run("Bio-Formats Exporter", "save=" + input + "MAX_" + file + " compression=Uncompressed");
-    close();
+
+    while (nImages>0) {
+        selectImage(nImages);
+        close();
+    }
 }
 
 processFolder(input);

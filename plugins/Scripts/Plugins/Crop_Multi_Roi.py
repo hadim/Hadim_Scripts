@@ -6,11 +6,9 @@
 from ij import IJ
 from ij.plugin.frame import RoiManager
 
-from io.scif.config import SCIFIOConfig
-from io.scif.img import ImageRegion
-from io.scif.img import ImgOpener
-from io.scif.img import ImgSaver
 from net.imagej.axis import Axes
+from net.imagej import DefaultDataset
+from net.imglib2 import FinalInterval
 
 import os
 
@@ -52,30 +50,42 @@ def main():
         w = bounds.width
         h = bounds.height  
     
-        # Import only cropped region of the image
-        axes = [Axes.X, Axes.Y]
-        ranges = ["%i-%i" % (x, x+w), "%i-%i" % (y, y+h)]
-        config = SCIFIOConfig()
-        config.imgOpenerSetRegion(ImageRegion(axes, ranges))
+        # Initiate dimensions
+        dims = {}
+        dim_names = [None] * 5
+        for ax in [Axes.X, Axes.Y, Axes.Z, Axes.TIME, Axes.CHANNEL]:
+            ax_index = active_dataset.dimensionIndex(ax)
+            dim_names[ax_index] = str(ax)
+            if int(active_dataset.dimension(ax_index)) == 1:
+                dims[str(ax)] = (0, 0)
+            else: 
+                dims[str(ax)] = (0, int(active_dataset.dimension(ax_index)) - 1)
+                
+        # Set cropped regions
+        dims['X'] = (x, x + w)
+        dims['Y'] = (y, y + h)
         
-        opener = ImgOpener()
-        imps = opener.openImgs(fname, config)
-        imp = imps[0]
+        # Set crop intervals
+        begin_interval = [dims[name][0] for name in dim_names]
+        end_interval = [dims[name][1] for name in dim_names]
+        interval = FinalInterval(begin_interval, end_interval)
         
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, active_dataset.getName())
         crop_fname = os.path.join(os.path.dirname(fname), crop_basename)
-        imp.setName(crop_basename)
+        
 
         # Create dataset
+        imp = ij.op().crop(interval, active_dataset.getImgPlus())
         ds = data.create(imp)
-    
-        # Save cropped image
-        IJ.log("Saving crop to %s" % crop_fname)
-        data.save(ds, crop_fname)
+        imp.setName(crop_basename)
 
         # Show cropped image
         ij.ui().show(ds.getName(), ds)
+        
+        # Save cropped image
+        IJ.log("Saving crop to %s" % crop_fname)
+        data.save(ds, crop_fname)
     
     IJ.log('Done')
 
