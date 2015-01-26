@@ -30,7 +30,7 @@ function processFile(input, file) {
     print("Processing: " + input + file);
     open(input + file);
     run("Z Project...", "projection=[Max Intensity] all");
-    run("Bio-Formats Exporter", "save=" + input + prefix + file + " compression=Uncompressed");
+    run("Bio-Formats Exporter", "save=" + input + prefix + file + " write_each_channel compression=Uncompressed");
 
     while (nImages>0) {
         selectImage(nImages);
