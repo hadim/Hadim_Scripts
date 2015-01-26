@@ -1,23 +1,27 @@
 setBatchMode(true);
 run("Bio-Formats Macro Extensions");
 
-input = getArgument();
+suffix = "Pos0.ome.tif";
+prefix = "MAX_";
 
-if(input == ""){
-    print("Please specify a folder as argument.");
-    eval("script", "System.exit(0);");
-}
+Dialog.create("Batch z-project");
+Dialog.addString("Suffix : ", suffix);
+Dialog.addString("Prefix : ", prefix);
+Dialog.addMessage("Now click OK to choose a directory.");
+Dialog.show();
+suffix = Dialog.getString();
+prefix = Dialog.getString();
+
+input = getDirectory("Choose a directory");
 
 input = input + "/";
-
-suffix = "Pos0.ome.tif";
 
 function processFolder(input) {
     list = getFileList(input);
     for (i = 0; i < list.length; i++) {
         if(endsWith(list[i], "/"))
             processFolder(input + list[i]);
-        if(endsWith(list[i], suffix) && !startsWith(list[i], "MAX_"))
+        if(endsWith(list[i], suffix) && !startsWith(list[i], prefix))
             processFile(input, list[i]);
     }
 }
@@ -26,8 +30,7 @@ function processFile(input, file) {
     print("Processing: " + input + file);
     open(input + file);
     run("Z Project...", "projection=[Max Intensity] all");
-    save(input + "MAX_" + file);
-    //run("Bio-Formats Exporter", "save=" + input + "MAX_" + file + " compression=Uncompressed");
+    run("Bio-Formats Exporter", "save=" + input + prefix + file + " compression=Uncompressed");
 
     while (nImages>0) {
         selectImage(nImages);
@@ -37,4 +40,3 @@ function processFile(input, file) {
 
 processFolder(input);
 print("Done");
-eval("script", "System.exit(0);");
