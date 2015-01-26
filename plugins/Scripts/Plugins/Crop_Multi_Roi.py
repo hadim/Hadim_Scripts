@@ -88,7 +88,7 @@ def main():
 
         # Save cropped image
         IJ.log("Saving crop to %s" % crop_fname)
-        #data.save(ds, crop_fname)
+        data.save(ds, crop_fname)
 
     IJ.log('Done')
 
