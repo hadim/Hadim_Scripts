@@ -2,6 +2,7 @@
 # @ImageDisplayService imgdisplay
 # @ImageJ ij
 # @AbstractLogService log
+# @DefaultLegacyService legacy
 
 from ij import IJ
 from ij.plugin.frame import RoiManager
@@ -9,13 +10,16 @@ from ij.plugin.frame import RoiManager
 from net.imagej.axis import Axes
 from net.imagej import DefaultDataset
 from net.imglib2 import FinalInterval
+from io.scif.img import ImgSaver
 
 import os
 
 def main():
 
     # Get active dataset
-    active_dataset = imgdisplay.getActiveDataset()
+    img = IJ.getImage()
+    display = legacy.getInstance().getImageMap().lookupDisplay(img)
+    active_dataset = imgdisplay.getActiveDataset(display)
 
     if not active_dataset:
         IJ.showMessage('No image opened.')
@@ -63,7 +67,7 @@ def main():
 
         # Set cropped regions
         dims['X'] = (x, x + w)
-        dims['Y'] = (y, y + h)
+        dims['Yecl'] = (y, y + h)
 
         # Set crop intervals
         begin_interval = [dims[name][0] for name in dim_names]
@@ -77,14 +81,14 @@ def main():
         # Create dataset
         imp = ij.op().crop(interval, active_dataset.getImgPlus())
         ds = data.create(imp)
-        imp.setName(crop_basename)
+        ds.setName(crop_basename)
 
         # Show cropped image
         ij.ui().show(ds.getName(), ds)
 
         # Save cropped image
         IJ.log("Saving crop to %s" % crop_fname)
-        data.save(ds, crop_fname)
+        #data.save(ds, crop_fname)
 
     IJ.log('Done')
 
