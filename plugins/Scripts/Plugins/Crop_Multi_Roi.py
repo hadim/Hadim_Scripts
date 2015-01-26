@@ -67,7 +67,7 @@ def main():
 
         # Set cropped regions
         dims['X'] = (x, x + w)
-        dims['Yecl'] = (y, y + h)
+        dims['Y'] = (y, y + h)
 
         # Set crop intervals
         begin_interval = [dims[name][0] for name in dim_names]
