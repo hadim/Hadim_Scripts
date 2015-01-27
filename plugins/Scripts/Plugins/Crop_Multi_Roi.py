@@ -88,8 +88,14 @@ def main():
 
         # Save cropped image
         IJ.log("Saving crop to %s" % crop_fname)
-        data.save(ds, crop_fname)
-
+        #data.save(ds, crop_fname)
+        
+        # Hack to get save works
+        imp = IJ.getImage()
+        IJ.run("Properties...", "frame=5")
+        IJ.run("Bio-Formats Exporter", "save=" + crop_fname + " compression=Uncompressed")
+        imp.close()
+        
     IJ.log('Done')
 
 main()
