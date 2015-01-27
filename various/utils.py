@@ -23,3 +23,5 @@ for root, dirs, files in os.walk(path):
     for f in files:
         if f.endswith("Pos0.ome.tif"):
             process(root, f)
+
+print("done")
