@@ -2,7 +2,7 @@
 # @ImageDisplayService displayservice
 # @ImageJ ij
 # @AbstractLogService log
-# @DefaultLegacyService legacy
+# @DefaultLegacyService legacyservice
 
 from ij import IJ
 from ij.plugin.frame import RoiManager
@@ -15,12 +15,13 @@ import sys
 
 sys.path.append(os.path.join(IJ.getDirectory('plugins'), "Scripts", "Plugins"))
 from libtools import crop
+from libtools.utils import get_dt
 
 def main():
 
     # Get active dataset
     img = IJ.getImage()
-    display = legacy.getInstance().getImageMap().lookupDisplay(img)
+    display = legacyservice.getInstance().getImageMap().lookupDisplay(img)
     active_dataset = displayservice.getActiveDataset(display)
 
     if not active_dataset:
@@ -42,6 +43,8 @@ def main():
     if not rois:
         IJ.showMessage('No ROIs. Please use Analyze > Tools > ROI Manager...')
         return
+
+    dt = get_dt(active_dataset)
 
     rois_array = rois.getRoisAsArray()
     for i, roi in enumerate(rois_array):
@@ -65,7 +68,7 @@ def main():
         # Save cropped image (ugly hack)
         IJ.log("Saving crop to %s" % crop_fname)
         imp = IJ.getImage()
-        IJ.run("Properties...", "frame=5")
+        IJ.run("Properties...", "frame=%f" % (dt))
         IJ.run("Bio-Formats Exporter", "save=" + crop_fname + " compression=Uncompressed")
         imp.close()
 
