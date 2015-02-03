@@ -7,10 +7,12 @@ prefix = "MAX_";
 Dialog.create("Batch z-project");
 Dialog.addString("Suffix : ", suffix);
 Dialog.addString("Prefix : ", prefix);
+Dialog.addCheckbox("Use bioformats for saving", false);
 Dialog.addMessage("Now click OK to choose a directory.");
 Dialog.show();
 suffix = Dialog.getString();
 prefix = Dialog.getString();
+use_bioformats = Dialog.getCheckbox(); 
 
 input = getDirectory("Choose a directory");
 
@@ -30,8 +32,13 @@ function processFile(input, file) {
     print("Processing: " + input + file);
     open(input + file);
     run("Z Project...", "projection=[Max Intensity] all");
-    run("Bio-Formats Exporter", "save=" + input + prefix + file + " write_each_channel compression=Uncompressed");
-
+    if (use_bioformats) {
+        run("Bio-Formats Exporter", "save=" + input + prefix + file + " write_each_channel compression=Uncompressed");
+    }
+    else{
+        run("Save", "save=" + input + prefix + file);
+    }
+    
     while (nImages>0) {
         selectImage(nImages);
         close();
