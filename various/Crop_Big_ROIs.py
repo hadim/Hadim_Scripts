@@ -28,6 +28,7 @@ sys.path.append(os.path.join(IJ.getDirectory('plugins'), "Scripts", "Plugins"))
 from libtools import crop
 from libtools.utils import get_dt
 
+
 def main():
 
     # Get image path
@@ -48,11 +49,11 @@ def main():
             roi_path = glob.glob(os.path.join(dir_path, "*.roi"))[0]
         except:
             roi_path = None
-    
+
     if not roi_path:
         IJ.showMessage('No ROIs. Please use Analyze > Tools > ROI Manager...')
         return
-    
+
     rois = RoiManager(True)
     rois.reset()
     rois.runCommand("Open", roi_path)
@@ -62,7 +63,7 @@ def main():
     rois_array = rois.getRoisAsArray()
     for i, roi in enumerate(rois_array):
 
-        crop_id = i +1
+        crop_id = i + 1
         IJ.log("Crop region %i / %i" % (crop_id, len(rois_array)))
 
         # Get filename and basename of the current cropped image
@@ -76,14 +77,14 @@ def main():
         y = bounds.y
         w = bounds.width
         h = bounds.height
-    
+
         # Import only cropped region of the image
         options = ImporterOptions()
         options.setCrop(True)
         options.setCropRegion(0, Region(x, y, w, h))
         options.setId(fname)
         imps = BF.openImagePlus(options)
-    
+
         imp = imps[0]
         #imp.show()
 
@@ -95,7 +96,7 @@ def main():
         bfExporter.run(None)
 
         #FileSaver(imp).saveAsTiff(crop_fname)
-        
+
         imp.close()
 
     IJ.log('Done')

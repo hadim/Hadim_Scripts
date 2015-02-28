@@ -8,8 +8,8 @@ from ij import IJ
 from ij.plugin.frame import RoiManager
 
 from net.imagej import DefaultDataset
-from loci.plugins import LociExporter 
-from loci.plugins.out import Exporter 
+from loci.plugins import LociExporter
+from loci.plugins.out import Exporter
 
 import os
 import sys
@@ -18,6 +18,7 @@ import glob
 sys.path.append(os.path.join(IJ.getDirectory('plugins'), "Scripts", "Plugins"))
 from libtools import crop
 from libtools.utils import get_dt
+
 
 def main():
 
@@ -47,11 +48,11 @@ def main():
                 roi_path = glob.glob(os.path.join(dir_path, "*.roi"))[0]
             except:
                 roi_path = None
-        
+
         if not roi_path:
             IJ.showMessage('No ROIs. Please use Analyze > Tools > ROI Manager...')
             return
-        
+
         rois = RoiManager(True)
         rois.reset()
         rois.runCommand("Open", roi_path)
@@ -62,7 +63,7 @@ def main():
     rois_array = rois.getRoisAsArray()
     for i, roi in enumerate(rois_array):
 
-        crop_id = i +1
+        crop_id = i + 1
         IJ.log("Croping %i / %i" % (crop_id, len(rois_array)))
 
         # Get filename and basename of the current cropped image
@@ -82,8 +83,12 @@ def main():
         IJ.log("Saving crop to %s" % crop_fname)
 
         imp = IJ.getImage()
-        IJ.run("Properties...", "frame=%f" % (dt))
-        IJ.run("Bio-Formats Exporter", "save=" + crop_fname + " compression=Uncompressed")
+        bfExporter = LociExporter()
+        macroOpts = "save=[" + crop_fname + "]"
+        bfExporter.setup(None, imp)
+        Macro.setOptions(macroOpts)
+        bfExporter.run(None)
+
         imp.close()
 
     IJ.log('Done')
