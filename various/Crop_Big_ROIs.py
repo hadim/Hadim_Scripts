@@ -6,6 +6,7 @@
 
 from ij import IJ
 from ij import Macro
+from ij.io import FileSaver
 from ij.plugin.frame import RoiManager
 
 from io.scif.img import ImgSaver
@@ -16,6 +17,8 @@ from loci.plugins import LociExporter
 from loci.plugins.out import Exporter
 from loci.plugins.in import ImporterOptions
 from loci.common import Region
+
+from net.imglib2.img import ImagePlusAdapter
 
 import os
 import sys
@@ -29,6 +32,7 @@ def main():
 
     # Get image path
     fname = "/home/hadim/local/data/microscopy_data/zurick/movies/metC.ome.tif"
+    #fname = "/home/hadim/Documents/phd/data/test/test.ome.tif"
 
     basename = os.path.basename(fname)
     dir_path = os.path.dirname(fname)
@@ -59,7 +63,7 @@ def main():
     for i, roi in enumerate(rois_array):
 
         crop_id = i +1
-        IJ.log("Open cropped region %i / %i" % (crop_id, len(rois_array)))
+        IJ.log("Crop region %i / %i" % (crop_id, len(rois_array)))
 
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, basename)
@@ -78,10 +82,10 @@ def main():
         options.setCrop(True)
         options.setCropRegion(0, Region(x, y, w, h))
         options.setId(fname)
-        #options.setVirtual(True)
         imps = BF.openImagePlus(options)
     
         imp = imps[0]
+        #imp.show()
 
         # Save cropped image
         bfExporter = LociExporter()
@@ -89,6 +93,8 @@ def main():
         bfExporter.setup(None, imp)
         Macro.setOptions(macroOpts)
         bfExporter.run(None)
+
+        #FileSaver(imp).saveAsTiff(crop_fname)
         
         imp.close()
 

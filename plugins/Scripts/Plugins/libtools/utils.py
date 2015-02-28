@@ -5,6 +5,7 @@ from io.scif.filters import AbstractMetadataWrapper
 from io.scif.img import SCIFIOImgPlus
 from ij import IJ
 
+
 def get_dt(dataset):
 
     imp = dataset.getImgPlus()
@@ -13,7 +14,10 @@ def get_dt(dataset):
     while isinstance(metadata, AbstractMetadataWrapper):
         metadata = metadata.unwrap()
 
-    metadata = metadata.getOmeMeta()
-    dt = metadata.getRoot().getPixelsTimeIncrement(0)
+    try:
+        metadata = metadata.getOmeMeta()
+        dt = metadata.getRoot().getPixelsTimeIncrement(0)
+    except:
+        dt = 1
 
     return dt
