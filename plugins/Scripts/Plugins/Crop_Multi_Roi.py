@@ -5,6 +5,7 @@
 # @DefaultLegacyService legacyservice
 
 from ij import IJ
+from ij import Macro
 from ij.plugin.frame import RoiManager
 
 from net.imagej import DefaultDataset
@@ -68,6 +69,7 @@ def main():
 
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, active_dataset.getName())
+        crop_basename = os.path.splitext(crop_basename)[0] + ".ome.tif"
         crop_fname = os.path.join(os.path.dirname(fname), crop_basename)
 
         # Get bounds and crop

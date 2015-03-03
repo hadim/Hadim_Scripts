@@ -32,7 +32,7 @@ from libtools.utils import get_dt
 def main():
 
     # Get image path
-    fname = "/home/hadim/local/data/microscopy_data/zurick/movies/metC.ome.tif"
+    fname = "/home/hadim/local/data/microscopy_data/zurick/movies/metC_5/metC__5.nd"
     #fname = "/home/hadim/Documents/phd/data/test/test.ome.tif"
 
     basename = os.path.basename(fname)
@@ -68,6 +68,7 @@ def main():
 
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, basename)
+        crop_basename = os.path.splitext(crop_basename)[0] + ".ome.tif"
         crop_fname = os.path.join(os.path.dirname(fname), crop_basename)
 
         # Get bounds and crop
@@ -89,13 +90,15 @@ def main():
         #imp.show()
 
         # Save cropped image
+        """
         bfExporter = LociExporter()
         macroOpts = "save=[" + crop_fname + "]"
         bfExporter.setup(None, imp)
         Macro.setOptions(macroOpts)
         bfExporter.run(None)
+        """
 
-        #FileSaver(imp).saveAsTiff(crop_fname)
+        IJ.run(imp, "Save", "save=" + crop_fname + "");
 
         imp.close()
 
