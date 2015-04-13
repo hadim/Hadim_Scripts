@@ -1,7 +1,7 @@
 #!/usr/bin/sh
 
-BF_VERSION="5.1.0"
-BF_URL="http://downloads.openmicroscopy.org/bio-formats/$BF_VERSION/artifacts/"
+BF_VERSION="5.1"
+BF_URL="http://downloads.openmicroscopy.org/latest/bio-formats$BF_VERSION/artifacts/"
 
 FIJI_PATH=$1
 
