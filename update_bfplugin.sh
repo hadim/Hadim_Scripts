@@ -19,7 +19,7 @@ rm -f $FIJI_PATH/jars/bio-formats/mdbtools-java-5.0.7.jar
 rm -f $FIJI_PATH/jars/bio-formats/metakit-5.0.7.jar
 rm -f $FIJI_PATH/jars/bio-formats/formats-api-5.0.7.jar
 
-wget $BF_URL/bioformats_package.jar -O $FIJI_PATH/plugins/bioformats_package.jar
+wget $BF_URL/bio-formats_plugins.jar -O $FIJI_PATH/plugins/bio-formats_plugins.jar
 
 wget $BF_URL/jai_imageio.jar -O $FIJI_PATH/jars/bio-formats/jai_imageio.jar
 wget $BF_URL/formats-gpl.jar -O $FIJI_PATH/jars/bio-formats/formats-gpl.jar
