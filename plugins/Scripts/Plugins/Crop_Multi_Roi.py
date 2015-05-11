@@ -1,8 +1,8 @@
 # @DatasetService datasetservice
-# @ImageDisplayService displayservice
+# @DisplayService displayservice
+# @ImageDisplayService imagedisplayservice
 # @ImageJ ij
 # @AbstractLogService log
-# @DefaultLegacyService legacyservice
 
 from ij import IJ
 from ij import Macro
@@ -24,9 +24,9 @@ from libtools.utils import get_dt
 def main():
 
     # Get active dataset
-    img = IJ.getImage()
-    display = legacyservice.getInstance().getImageMap().lookupDisplay(img)
-    active_dataset = displayservice.getActiveDataset(display)
+    #img = IJ.getImage()
+    display = displayservice.getActiveDisplay()
+    active_dataset = imagedisplayservice.getActiveDataset(display)
 
     if not active_dataset:
         IJ.showMessage('No image opened.')

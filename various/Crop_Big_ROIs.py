@@ -2,7 +2,6 @@
 # @ImageDisplayService displayservice
 # @ImageJ ij
 # @AbstractLogService log
-# @DefaultLegacyService legacyservice
 
 from ij import IJ
 from ij import Macro
@@ -32,8 +31,7 @@ from libtools.utils import get_dt
 def main():
 
     # Get image path
-    fname = "/home/hadim/local/data/microscopy_data/zurick/movies/metC_5/metC__5.nd"
-    #fname = "/home/hadim/Documents/phd/data/test/test.ome.tif"
+    fname = "/media/thor/data/microscopy_data/s2/movies/wt/raw/cgc_spd_MI.ims"
 
     basename = os.path.basename(fname)
     dir_path = os.path.dirname(fname)
@@ -97,7 +95,6 @@ def main():
         Macro.setOptions(macroOpts)
         bfExporter.run(None)
         """
-
         IJ.run(imp, "Save", "save=" + crop_fname + "");
 
         imp.close()
