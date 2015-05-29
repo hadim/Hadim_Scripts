@@ -31,7 +31,7 @@ from libtools.utils import get_dt
 def main():
 
     # Get image path
-    fname = "/media/thor/data/microscopy_data/s2/movies/wt/raw/cgc_spd_MI.ims"
+    fname = "/media/thor/data/microscopy_data/soumya/movies/wt/2015.05.29/cgc_spd_1_mII_crop.ims"
 
     basename = os.path.basename(fname)
     dir_path = os.path.dirname(fname)
@@ -66,8 +66,8 @@ def main():
 
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, basename)
-        crop_basename = os.path.splitext(crop_basename)[0] + ".ome.tif"
-        crop_fname = os.path.join(os.path.dirname(fname), crop_basename)
+        crop_basename = os.path.splitext(crop_basename)[0] + ".tif"
+        crop_fname = os.path.join(os.path.dirname(fname), "crop", crop_basename)
 
         # Get bounds and crop
         bounds = roi.getBounds()
@@ -87,14 +87,7 @@ def main():
         imp = imps[0]
         #imp.show()
 
-        # Save cropped image
-        """
-        bfExporter = LociExporter()
-        macroOpts = "save=[" + crop_fname + "]"
-        bfExporter.setup(None, imp)
-        Macro.setOptions(macroOpts)
-        bfExporter.run(None)
-        """
+        # Save cropped image as raw Tiff
         IJ.run(imp, "Save", "save=" + crop_fname + "");
 
         imp.close()
