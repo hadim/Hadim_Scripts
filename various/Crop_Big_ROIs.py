@@ -66,7 +66,7 @@ def main():
 
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, basename)
-        crop_basename = os.path.splitext(crop_basename)[0] + ".tif"
+        crop_basename = os.path.splitext(crop_basename)[0] + ".ome.tif"
         crop_fname = os.path.join(os.path.dirname(fname), "crop", crop_basename)
 
         # Get bounds and crop
