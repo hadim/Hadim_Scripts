@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 
-BF_VERSION="5.1"
-BF_URL="http://downloads.openmicroscopy.org/latest/bio-formats$BF_VERSION/artifacts/"
+BF_VERSION="5.1.5"
+BF_URL="https://downloads.openmicroscopy.org/bio-formats/$BF_VERSION/artifacts/"
 
 BFTOOLS_PATH=$1
 
