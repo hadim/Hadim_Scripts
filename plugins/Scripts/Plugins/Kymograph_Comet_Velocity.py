@@ -2,8 +2,8 @@
 # @Float(label="Pixel Length (um)", value=1) pixel_length
 # @Float(label="Minimal duration of a run (s)", value=0) minimal_duration
 # @Float(label="Minimal length of a run (um)", value=0) minimal_length
-# @Boolean(label="Do you want to save results files ?", required=False) save_results
-# @Boolean(label="Do you want to save ROI files ?", required=False) save_roi
+# @Boolean(label="Do you want to save result file ?", required=False) save_results
+# @Boolean(label="Do you want to save ROI file ?", required=False) save_roi
 # @ImageJ ij
 # @ImagePlus img
 # @Dataset data
