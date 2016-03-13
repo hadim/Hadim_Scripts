@@ -55,7 +55,7 @@ def create_kymograph(dataset, line, t_dim, debug=False):
     line_width = max(line_width, 1)
     
     # Create kymograph dataset
-    dims = [t_dim, line_length + 1000, line_width]
+    dims = [t_dim, line_length, line_width]
     axes = [Axes.X, Axes.Y, Axes.Z]
     kymograph = ij.dataset().create(dims, "Kymograph", axes,
                                     dataset.getValidBits(),
@@ -127,11 +127,13 @@ def main():
     # Get line ROI
     line = img.getRoi()
     
-    if line == None or line.getTypeAsString() != "Straight Line":
-        ij.ui().showDialog("Please use the Straight Line selection tool.")
+    if line == None or (line.getTypeAsString() != "Straight Line" and line.getTypeAsString() != "Segmented Line"):
+        ij.ui().showDialog("Please use the Straight Line or Segmented Line selection tool.")
         return False
 
     # Create kymograph
-    create_kymograph(dataset, line, t_dim)
+    #create_kymograph(dataset, line, t_dim)
+
+    
     
 main()
