@@ -33,7 +33,7 @@ def main():
     if isinstance(metadata, Metadata):
         omeMeta = metadata.getOmeMeta()
     else:
-        IJ.showMessage("This file does not contain OME metadata")
+        ij.ui().showDialog("This file does not contain OME metadata")
         return
 
     # Get xml string and print it with spaces indentation
