@@ -54,8 +54,8 @@ def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_ky
     
         current_line = Line(new_x1, new_y1, new_x2, new_y2)
         current_line.setStrokeWidth(1)
-        #img.setRoi(current_line)
-    
+        img.setRoi(current_line)
+        
         xpoints = current_line.getInterpolatedPolygon().xpoints
         ypoints = current_line.getInterpolatedPolygon().ypoints
     
@@ -67,10 +67,9 @@ def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_ky
     
             # Iterate over the time axis
             for t in range(t_dim):
-                pass
-                #cursor_image.setPosition([x, y, t])
+                cursor_image.setPosition([x, y, t])
                 cursor_kymo.setPosition([t, offset + j, i])
-                #cursor_kymo.get().set(cursor_image.get())
+                cursor_kymo.get().set(cursor_image.get())
 
 
 def create_kymograph(dataset, lines, t_dim, roi):
