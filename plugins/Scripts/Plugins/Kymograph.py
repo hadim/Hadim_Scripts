@@ -71,6 +71,9 @@ def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_ky
                 cursor_kymo.setPosition([t, offset + j, i])
                 cursor_kymo.get().set(cursor_image.get())
 
+        """while cursor_image.hasNext():
+            cursor_image.next()"""
+
 
 def create_kymograph(dataset, lines, t_dim, roi):
     """
@@ -112,6 +115,7 @@ def create_kymograph(dataset, lines, t_dim, roi):
 
     # Get image and kymograph cursor
     cursor_image = imgp.randomAccess()
+    #cursor_image = imgp.localizingCursor()
     cursor_kymo = kymo_img.randomAccess()
 
     offset = 0

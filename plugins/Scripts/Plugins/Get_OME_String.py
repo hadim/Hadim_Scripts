@@ -42,4 +42,6 @@ def main():
     xml_string = minidom.parseString(xml_string.encode('utf-8')).toprettyxml(indent="  ")
     ij.log().info(xml_string)
 
+    #open("/home/hadim/md.xml", "w").write(xml_string.encode('utf-8'))
+
 main()
