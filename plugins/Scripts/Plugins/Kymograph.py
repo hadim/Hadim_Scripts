@@ -18,9 +18,12 @@ def ask_swap_dimensions(dataset):
     from org.scijava.ui.DialogPrompt import MessageType
     from org.scijava.ui.DialogPrompt import OptionType
     from org.scijava.ui.DialogPrompt import Result
+
+    zIdx = dataset.dimensionIndex(Axes.Z)
+    timeIdx = dataset.dimensionIndex(Axes.TIME)
     
-    t_dim = dataset.dimension(dataset.dimensionIndex(Axes.TIME))
-    z_dim = dataset.dimension(dataset.dimensionIndex(Axes.Z))
+    t_dim = dataset.dimension(timeIdx)
+    z_dim = dataset.dimension(zIdx)
     
     if t_dim < z_dim:
         yes_no = ij.ui().showDialog("It appears this image has %i timepoints and %i Z slices.\n"
@@ -29,10 +32,10 @@ def ask_swap_dimensions(dataset):
                                     OptionType.YES_NO_OPTION)
                                     
         if yes_no == Result.YES_OPTION:
-            z_dim, t_dim = t_dim, z_dim
-
-    return z_dim, t_dim
-
+            if zIdx != -1:
+                dataset.axis(zIdx).setType(Axes.TIME)
+            if timeIdx != -1:
+                dataset.axis(timeIdx).setType(Axes.Z)
 
 def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_kymo, offset):
     """
@@ -58,7 +61,7 @@ def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_ky
         
         xpoints = current_line.getInterpolatedPolygon().xpoints
         ypoints = current_line.getInterpolatedPolygon().ypoints
-    
+        
         # Iterate over every pixels defining the line
         for j, (x, y) in enumerate(zip(xpoints[:-1], ypoints[:-1])):
         
@@ -67,7 +70,7 @@ def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_ky
     
             # Iterate over the time axis
             for t in range(t_dim):
-                cursor_image.setPosition([x, y, t])
+                cursor_image.setPosition([x, y, 0, t])
                 cursor_kymo.setPosition([t, offset + j, i])
                 cursor_kymo.get().set(cursor_image.get())
 
@@ -75,10 +78,13 @@ def fill_kymograph(line, vector, t_dim, line_width, img, cursor_image, cursor_ky
             cursor_image.next()"""
 
 
-def create_kymograph(dataset, lines, t_dim, roi):
+def create_kymograph(dataset, lines, roi):
     """
     """
-    
+
+    timeIdx = dataset.dimensionIndex(Axes.TIME)
+    t_dim = dataset.dimension(timeIdx)
+    print(dataset.dimensionIndex(Axes.Z))
     # Get ImgPlus
     imgp = dataset.getImgPlus()
 
@@ -105,9 +111,10 @@ def create_kymograph(dataset, lines, t_dim, roi):
                   "total length of %i to process." % (len(lines), line_width, total_length))
 
     # Create kymograph dataset
-    dims = [t_dim, total_length, line_width]
+    dims = [t_dim, total_length - len(lines) + 1, line_width]
     axes = [Axes.X, Axes.Y, Axes.Z]
-    kymograph = ij.dataset().create(dims, "Kymograph", axes,
+    title = dataset.getName() + " (Kymograph)"
+    kymograph = ij.dataset().create(dims, title, axes,
                                     dataset.getValidBits(),
                                     dataset.isSigned(),
                                     not dataset.isInteger())
@@ -115,16 +122,15 @@ def create_kymograph(dataset, lines, t_dim, roi):
 
     # Get image and kymograph cursor
     cursor_image = imgp.randomAccess()
-    #cursor_image = imgp.localizingCursor()
     cursor_kymo = kymo_img.randomAccess()
-
+    
     offset = 0
     for line, vector, length in zip(lines, lines_vector_scaled, lines_length):
 
         fill_kymograph(line, vector, t_dim, line_width, img,
                        cursor_image, cursor_kymo, offset)
 
-        offset += length
+        offset += length - 1
     
      # Put back the original line ROI
     img.setRoi(roi)
@@ -141,17 +147,18 @@ def project_kymograph(kymograph):
     y_dim = kymograph.dimension(kymograph.dimensionIndex(Axes.Y))
     dims = [x_dim, y_dim]
     axes = [Axes.X, Axes.Y]
-    kymograph_projected = ij.dataset().create(dims, "Projected Kymograph", axes,
+    title = dataset.getName() + " (Projected Kymograph)"
+    kymograph_projected = ij.dataset().create(dims, title, axes,
                                               dataset.getValidBits(),
                                               dataset.isSigned(),
                                               not dataset.isInteger())
     
     # Project kymograph (max or mean) with IJ Ops
     max_op = ij.op().op(Ops.Stats.Max, kymograph)
-    ij.op().image().project(kymograph_projected.getImgPlus().getImg(),
-                            kymograph,
-                            max_op,
-                            kymograph.dimensionIndex(Axes.Z))
+    ij.op().transform().project(kymograph_projected.getImgPlus().getImg(),
+                                kymograph,
+                                max_op,
+                                kymograph.dimensionIndex(Axes.Z))
 
     return kymograph_projected
 
@@ -159,12 +166,17 @@ def project_kymograph(kymograph):
 # Main functions
 
 def main():
-
-    z_dim, t_dim = ask_swap_dimensions(dataset)
+    print(dataset.dimensionIndex(Axes.TIME))
+    ask_swap_dimensions(dataset)
+    print(dataset.dimensionIndex(Axes.TIME))
 
     # Get line ROI
     roi = img.getRoi()
 
+    if(not roi):
+        ij.ui().showDialog("Please define a line in order to build the kymograph.")
+        return False
+    
     # Check roi and convert it to a list of line
     if roi.getTypeAsString() == "Straight Line":
         lines = [[[roi.x1, roi.y1], [roi.x2, roi.y2]]]
@@ -184,7 +196,7 @@ def main():
         ij.ui().showDialog("Please use the Straight Line or Segmented Line selection tool.")
         return False
 
-    kymograph = create_kymograph(dataset, lines, t_dim, roi)
+    kymograph = create_kymograph(dataset, lines, roi)
     kymograph_projected = project_kymograph(kymograph)
     
     # Display dataset
