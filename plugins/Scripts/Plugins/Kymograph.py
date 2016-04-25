@@ -196,6 +196,8 @@ def main():
         ij.ui().showDialog("Please use the Straight Line or Segmented Line selection tool.")
         return False
 
+    print(lines)
+
     kymograph = create_kymograph(dataset, lines, roi)
     kymograph_projected = project_kymograph(kymograph)
     
