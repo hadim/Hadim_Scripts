@@ -14,7 +14,7 @@ rm = RoiManager.getInstance()
 counter = 0
 
 parent_folder = File(dataset.getSource()).getParent()
-
+"""
 for roi in rm.getRoisAsArray():
     if roi.isLine():
 
@@ -27,6 +27,9 @@ for roi in rm.getRoisAsArray():
         kymo = kfactory.getKymograph()
         ij.ui().show(title, kymo)
 
-        io.save(kymo, os.path.join(parent_folder, title) + ".tif")
+        io.save(kymo, os.path.join(parent_folder, title) + ".tif")"""
+
+roi_path = os.path.join(parent_folder, os.path.splitext(dataset.getName())[0] + ".zip")
+rm.runCommand("Save", roi_path)
 
 log.info("MultiKymographBuilder Finished. " + str(counter) + " ROIs processed")
