@@ -6,6 +6,7 @@
 
 import os
 
+from ij import IJ
 from ij.plugin.frame import RoiManager
 import fiji.plugin.kymographbuilder.KymographFactory as KFactory
 from java.io import File
@@ -26,6 +27,14 @@ for roi in rm.getRoisAsArray():
         
         kymo = kfactory.getKymograph()
         ij.ui().show(title, kymo)
+
+        # Make the display prettier (IJ1 way)
+        IJ.getImage().setDisplayMode(IJ.COMPOSITE)
+        IJ.run("Set... ", "zoom=600")
+        #IJ.getImage().setActiveChannel("100")
+        #IJ.run("Enhance Contrast", "saturated=0.35 equalize")
+        #IJ.getImage().setActiveChannel("010")
+        #IJ.run("Enhance Contrast", "saturated=0.35 equalize")
 
         io.save(kymo, os.path.join(parent_folder, title) + ".tif")
 
