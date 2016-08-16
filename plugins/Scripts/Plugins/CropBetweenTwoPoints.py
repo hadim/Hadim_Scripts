@@ -31,7 +31,6 @@ y_end = end.getContainedPoints()[0].y
 
 images = []
 
-# Create a list of position between the starting and the final point
 length = math.sqrt((x_start - x_end) ** 2 + (y_start - y_end) ** 2)
 unit_length = length / (z_end - z_start)
 
