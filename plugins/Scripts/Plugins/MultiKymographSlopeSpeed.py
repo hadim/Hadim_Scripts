@@ -33,7 +33,8 @@ for dataset in datasetService.getDatasets():
 		_, roi_id, roi_name = dataset.getName().split("_")
 		roi_name = roi_name.split(".")[0]
 	
-		IJ.selectWindow(dataset.getName().split(".")[0])
+		#IJ.selectWindow(dataset.getName().split(".")[0])
+		IJ.selectWindow(dataset.getName())
 		imp = IJ.getImage()
 		roi = imp.getRoi()
 
