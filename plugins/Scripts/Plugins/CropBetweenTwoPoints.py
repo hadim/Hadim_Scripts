@@ -43,7 +43,6 @@ for i, z in enumerate(range(z_start, z_end)):
 	d = i * unit_length
 	x = int(round(x_start + (d * (x_end - x_start) / length), 0))
 	y = int(round(y_start + (d * (y_end - y_start) / length), 0))
-	print(x, y)
 
 	# Crop the dataset around the current centered point
 	x1 = int(x - box_size / 2)
