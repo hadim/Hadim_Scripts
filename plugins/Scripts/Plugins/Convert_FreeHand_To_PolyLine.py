@@ -1,4 +1,5 @@
-# @Integer(label="Points Density", value=10) points_density
+# @Integer(label="Points Density", value=20) points_density
+# @Boolean(label="Smooth Line", value=True) smooth
 # @StatusService status
 
 from ij.plugin.frame import RoiManager
@@ -24,21 +25,14 @@ def main():
 		# Select only FreeLine/FreeHand ROIs
 		if roi.type == Roi.FREELINE:
 		
-			x = []
-			y = []
-			xRoi = roi.getPolygon().xpoints
-			yRoi = roi.getPolygon().ypoints
-			
-			for j in range(0, roi.getNCoordinates(), points_density):
-				x.append(xRoi[j])
-				y.append(yRoi[j])
+			fp = roi.getInterpolatedPolygon()
+			fp = roi.getInterpolatedPolygon(fp.getLength(False) / points_density, smooth)
+			newRoi = PolygonRoi(fp, Roi.POLYLINE)
+			newRois.append(newRoi)
 	
 			# Delete old ROI
 			rm.select(i)
 			rm.runCommand("Delete")
-
-			newRoi = PolygonRoi(x, y, Roi.POLYLINE)
-			newRois.append(newRoi)
 
 	for roi in newRois:
 		# Add new ROI
