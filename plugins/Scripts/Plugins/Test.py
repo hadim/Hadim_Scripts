@@ -5,7 +5,7 @@ from net.imglib2.util import Intervals
 from net.imagej.axis import Axes
 from net.imagej.ops import Ops
 from net.imglib2.type.numeric.integer import UnsignedShortType
-from net.imglib2.type.numeric.integer import UnsignedByteType
+from net.imglib2.type.numeric.integer import ShortType
 
 # Get the first frame
 t_dim = data.dimensionIndex(Axes.TIME)
@@ -23,13 +23,17 @@ intervals = interval_start + interval_end
 intervals = Intervals.createMinMax(*intervals)
 
 first_frame = ij.op().transform().crop(data.getImgPlus(), intervals)
-ij.ui().show("first_frame", first_frame)
+#ij.ui().show("first_frame", first_frame)
 
 # Subtract the first frame to the stack
-subtracted = ij.op().create().img(data.getImgPlus())
+pixel_type = data.getImgPlus().firstElement().__class__
+subtracted = ij.op().create().img(data.getImgPlus(), pixel_type())
 sub_op =  ij.op().op("math.subtract", first_frame, first_frame)
 
-ij.op().slice(subtracted, data.getImgPlus(), sub_op, [t_dim])
+fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
+print(fixed_axis)
+
+ij.op().slice(subtracted, data.getImgPlus(), sub_op, fixed_axis)
 ij.ui().show("subtracted", subtracted)
 
-print(data.getImgPlus().class)
+print(data.getImgPlus().firstElement().__class__)
