@@ -189,8 +189,10 @@ def main():
 		spots_fname = os.path.join(analysis_dir, name + "_Comets_ROI.zip")
 		rm.runCommand("Save", spots_fname)
 		log.info("Saving detected spots to %s" % (spots_fname))
-	
-		duration = kymograph_imp.width * dt
+
+		# Calculate the results
+		timepoints = data.dimension(data.dimensionIndex(Axes.TIME))
+		duration = timepoints * dt
 		events_number = len(spots)
 		rate = (events_number / duration) * 60
 		results.append([os.path.basename(dir_path), i+1, rate, duration, events_number])
