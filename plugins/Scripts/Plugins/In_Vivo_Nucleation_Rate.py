@@ -18,6 +18,7 @@
 
 import os
 import math
+import shutil
 
 from net.imagej.axis import Axes
 from net.imagej.ops import Ops
@@ -153,6 +154,12 @@ def main():
 	analysis_dir = os.path.join(dir_path, "Analysis")
 	if not os.path.exists(analysis_dir):
 		os.makedirs(analysis_dir)
+	else:
+		for root, dirs, files in os.walk(analysis_dir):
+		    for f in files:
+		        os.unlink(os.path.join(root, f))
+		    for d in dirs:
+		        shutil.rmtree(os.path.join(root, d))
 	
 	# Do Z Projection
 	z_projected = z_project(data)
@@ -177,6 +184,7 @@ def main():
 			cen2_y = cell['cen2'][1]
 			# Draw line both centrosomes
 			# TODO
+			continue
 		else:
 			# Draw line around the unique centrosome
 			xpoints, ypoints = get_circle_points(cen1_x, cen1_y, radius=radius, n=n_points_circle)
@@ -289,6 +297,7 @@ def main():
 	if close_windows:
 		IJ.selectWindow("Z_Projection.tif")
 		IJ.getImage().close()
+	rm = get_roi_manager(new=True)
 	rm.runCommand("Reset")
 	
 	# Write results in csv
