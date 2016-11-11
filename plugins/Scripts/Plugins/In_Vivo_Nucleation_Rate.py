@@ -1,5 +1,4 @@
 # @Float(label="dt (sec)", required=true, value=3) dt
-# @Integer(label="Centrosome Distance Threshold (pixel)", required=true, value=50) cen_threshold_distance
 # @Integer(label="Number of points for Kymo Line", required=true, value=30) n_points_circle
 # @Integer(label="Line Width for Kymo Line (pixel)", required=true, value=4) line_width
 # @Integer(label="Radius of the line to make the kymograph (pixel)", required=true, value=25) radius
@@ -100,15 +99,35 @@ def z_project(data):
 	return z_projected
 
 
+def in_circle(point, center, radius):
+	return ((point[0] - center[0])**2 + (point[1] - center[1])**2) < radius**2
+	
+
 def get_circle_points(x_center, y_center, radius, n=20):
-	xpoints = []
-	ypoints = []
-	for i in range(0, n+1):
-		x = math.cos(2*math.pi/n*i) * radius + x_center
-		y =  math.sin(2*math.pi/n*i) * radius + y_center
-		xpoints.append(x)
-		ypoints.append(y)
-	return xpoints[:-1], ypoints[:-1]
+		points = []
+		for i in range(0, n+1):
+			x = math.cos(2*math.pi/n*i) * radius + x_center
+			y =  math.sin(2*math.pi/n*i) * radius + y_center
+			points.append([x, y])
+		return points
+	
+	
+def get_two_circles_points(x1, y1, x2, y2, radius, n=20):
+	xcen, ycen = (x1 + x2) / 2, (y1 + y2) / 2
+	
+	#radius = math.sqrt((x1 - xcen)**2 + (y1 - ycen)**2)
+	#radius *= 1.1
+	
+	points1 = get_circle_points(x1, y1, radius, n=n)
+	points2 = get_circle_points(x2, y2, radius, n=n)
+	
+	points1_in_circle_index = [i for i, point in enumerate(points1) if in_circle(point, [x2, y2], radius)]
+	points2_in_circle_index = [i for i, point in enumerate(points2) if in_circle(point, [x1, y1], radius)]
+	
+	points1 = points1[points1_in_circle_index[-1] + 1:] + points1[:points1_in_circle_index[0]]
+	points2 = points2[points2_in_circle_index[-1] + 1:] + points2[:points2_in_circle_index[0]]
+
+	return points1 + points2
 
 
 def get_roi_manager(new=False):
@@ -159,7 +178,7 @@ def main():
 	centrosomes = [[p.x, p.y] for p in points]
 	log.info("%i centrosomes detected" % len(points))
 
-	cells = get_cells(centrosomes, cen_threshold_distance)
+	cells = get_cells(centrosomes, radius*2)
 	log.info("%i cells detected" % len(cells))
 	
 	# Set X and Y scale to 1
@@ -174,11 +193,14 @@ def main():
 	if not os.path.exists(analysis_dir):
 		os.makedirs(analysis_dir)
 	else:
-		for root, dirs, files in os.walk(analysis_dir):
-		    for f in files:
-		        os.unlink(os.path.join(root, f))
-		    for d in dirs:
-		        shutil.rmtree(os.path.join(root, d))
+		try:
+			for root, dirs, files in os.walk(analysis_dir):
+			    for f in files:
+			        os.remove(os.path.join(root, f))
+			    for d in dirs:
+			        shutil.rmtree(os.path.join(root, d))
+		except OSError:
+			pass
 	
 	# Do Z Projection
 	z_projected = z_project(data)
@@ -201,16 +223,17 @@ def main():
 		if cell['double']:
 			cen2_x = cell['cen2'][0]
 			cen2_y = cell['cen2'][1]
-			# Draw line both centrosomes
-			# TODO
-			continue
+			# Draw line around both centrosomes
+			points = get_two_circles_points(cen1_x, cen1_y, cen2_x, cen2_y, radius, n=n_points_circle)
 		else:
 			# Draw line around the unique centrosome
-			xpoints, ypoints = get_circle_points(cen1_x, cen1_y, radius=radius, n=n_points_circle)
-			circle = PolygonRoi(xpoints, ypoints, Roi.POLYLINE)
-			circle.setStrokeWidth(line_width)
-			rm = get_roi_manager(new=True)
-			rm.addRoi(circle)
+			points = get_circle_points(cen1_x, cen1_y, radius=radius, n=n_points_circle)
+			
+		xpoints, ypoints = list(zip(*points))
+		circle = PolygonRoi(xpoints, ypoints, Roi.POLYLINE)
+		circle.setStrokeWidth(line_width)
+		rm = get_roi_manager(new=True)
+		rm.addRoi(circle)
 	
 		# Save the ROI
 		rm.runCommand("Save", os.path.join(analysis_dir, name + "_Line_ROI.zip"))
@@ -295,7 +318,7 @@ def main():
 
 		result = {}
 		result['fname'] = os.path.basename(dir_path)
-		result['cell_id'] = i
+		result['cell_id'] = i + 1
 		result['double'] = cell['double']
 		result['cen1_x'] = cell['cen1'][0]
 		result['cen1_y'] = cell['cen1'][1]
@@ -356,8 +379,6 @@ def main():
 	table.incrementCounter()
 	table.addValue('Value', "radius_detection")
 	table.addValue('Key', radius_detection)
-	table.addValue('Value', "cen_threshold_distance")
-	table.addValue('Key', cen_threshold_distance)
 	para_fname = os.path.join(analysis_dir, "Parameters.csv")
 	table.save(para_fname)
 	log.info("Saving parameters to %s" % (para_fname))
