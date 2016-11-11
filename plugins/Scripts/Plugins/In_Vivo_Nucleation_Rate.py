@@ -16,6 +16,23 @@
 # @DatasetIOService io
 # @LocationService loc
 
+# Step 1 : Set image scale to 1
+# Step 2 : Create Analysis directory
+# Step 3 : Get user selected centrosomes and convert them to cell : each cell can have one or two centrosomes.
+# Step 4 : Do Z Projection if more than one stack on the Z axis
+# Step 5 : For each cell, do :
+#	1. Calculate the circle points around a unique centrosome or the glasses shape points when two centrosomes.
+#	2. Save the points are a ROI zip file.
+#	3. Compute kymograph and save it on disk.
+#	4. Subtract background on the kymograph.
+#	5. Detecte spots (nucleation event) on the kymograph.
+#	6. Filter spots using Otsu threshold method.
+#	7. Add detected spots to ROI Manager and save as a zip file.
+#	8. Compute results (nucleation rate, duration, etc)
+# Step 6 : Write results to a ResultsTable and save as .csv on disk.
+# Step 7 : Write parameters used to a ResultsTable and save as .csv on disk.
+
+
 import os
 import math
 import shutil
