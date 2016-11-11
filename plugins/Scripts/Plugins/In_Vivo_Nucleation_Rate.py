@@ -71,6 +71,8 @@ def combinations(iterable, r):
 
 def z_project(data):
 	z_dim = data.dimensionIndex(Axes.Z)
+	if data.dimension(z_dim) == 1:
+		return data
 	projected_dimensions = [data.dimension(d) for d in range(0, data.numDimensions()) if d != z_dim]
 	axis = [data.axis(d) for d in range(0, data.numDimensions()) if d != z_dim]
 	z_projected = ops.create().img(projected_dimensions)
