@@ -18,6 +18,7 @@ sh install.sh /path/to/fiji/Fiji.app
 - Get_OME_String.py : display OME string of an OME Tiff file.
 - Kymograph.py : work in progress
 - Kymograph_Comet_Velocity.py : get length, duration and speed of comet from kymograph
+- ... and many [mores](./plugins/Scripts/Plugins)
 
 ### Macros
 
