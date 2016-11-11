@@ -1,6 +1,6 @@
 # @Float(label="dt (sec)", required=true, value=3) dt
 # @Integer(label="Centrosome Distance Threshold (pixel)", required=true, value=50) cen_threshold_distance
-# @Integer(label="Number of points for Kymo Line", required=true, value=20) n_points_circle
+# @Integer(label="Number of points for Kymo Line", required=true, value=30) n_points_circle
 # @Integer(label="Line Width for Kymo Line (pixel)", required=true, value=4) line_width
 # @Integer(label="Radius of the line to make the kymograph (pixel)", required=true, value=25) radius
 # @Float(label="Radius (for comet detection on kymograph) (pixel)", required=true, value=5) radius_detection
@@ -86,8 +86,8 @@ def get_circle_points(x_center, y_center, radius, n=20):
 	for i in range(0, n+1):
 		x = math.cos(2*math.pi/n*i) * radius + x_center
 		y =  math.sin(2*math.pi/n*i) * radius + y_center
-		xpoints.append(int(x))
-		ypoints.append(int(y))
+		xpoints.append(x)
+		ypoints.append(y)
 	return xpoints[:-1], ypoints[:-1]
 
 
