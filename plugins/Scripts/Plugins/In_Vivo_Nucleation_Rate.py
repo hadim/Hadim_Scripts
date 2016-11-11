@@ -1,4 +1,5 @@
 # @Float(label="dt (sec)", required=true, value=3) dt
+# @Integer(label="Centrosome Distance Threshold (pixel)", required=true, value=50) cen_threshold_distance
 # @Integer(label="Number of points for Kymo Line", required=true, value=20) n_points_circle
 # @Integer(label="Line Width for Kymo Line (pixel)", required=true, value=4) line_width
 # @Integer(label="Radius of the line to make the kymograph (pixel)", required=true, value=25) radius
@@ -29,8 +30,10 @@ from fiji.plugin.trackmate import Settings
 from fiji.plugin.trackmate import TrackMate
 from fiji.plugin.trackmate import SelectionModel
 from fiji.plugin.trackmate import Logger
+from fiji.plugin.trackmate import Spot
 from fiji.plugin.trackmate.detection import DogDetectorFactory
-
+import fiji.plugin.trackmate.features.FeatureFilter as FeatureFilter
+from fiji.plugin.trackmate.util import TMUtils
 import fiji.plugin.trackmate.features.FeatureFilter as FeatureFilter
 
 from ij.plugin.frame import RoiManager
@@ -44,6 +47,26 @@ from ij import IJ
 from java.awt import Polygon
 
 ## Functions
+
+def combinations(iterable, r):
+    # combinations('ABCD', 2) --> AB AC AD BC BD CD
+    # combinations(range(4), 3) --> 012 013 023 123
+    pool = tuple(iterable)
+    n = len(pool)
+    if r > n:
+        return
+    indices = list(range(r))
+    yield tuple(pool[i] for i in indices)
+    while True:
+        for i in reversed(range(r)):
+            if indices[i] != i + n - r:
+                break
+        else:
+            return
+        indices[i] += 1
+        for j in range(i+1, r):
+            indices[j] = indices[j-1] + 1
+        yield tuple(pool[i] for i in indices)
 
 def z_project(data):
 	z_dim = data.dimensionIndex(Axes.Z)
@@ -75,6 +98,33 @@ def get_roi_manager(new=False):
 	if new:
 		rm.runCommand("Reset")
 	return rm
+
+def get_cells(centrosomes, cen_threshold_distance):
+	# Check centrosomes close together and add them as a 'cell' dict
+	cells = []
+	used_centrosomes = []
+	for cen1, cen2 in combinations(centrosomes, 2):
+		d = math.sqrt((cen1[0] - cen2[0])**2 + (cen1[1] - cen2[1])**2)
+		
+		if d < cen_threshold_distance:
+			cell = {}
+			cell['double'] = True
+			cell['cen1'] = cen1
+			cell['cen2'] = cen2
+			cell['distance'] = d
+			cells.append(cell)
+			used_centrosomes += [cen1, cen2]
+	
+	# Add others "alone" centrosomes as a 'cell' dict
+	for cen in centrosomes:
+		if cen not in used_centrosomes:
+			cell = {}
+			cell['double'] = False
+			cell['cen1'] = cen
+			cell['cen2'] = None
+			cell['distance'] = 0
+			cells.append(cell)
+	return cells
 		
 ## Main Code
 
@@ -88,6 +138,9 @@ def main():
 	points = roi.getContainedPoints()
 	centrosomes = [[p.x, p.y] for p in points]
 	log.info("%i centrosomes detected" % len(points))
+
+	cells = get_cells(centrosomes, cen_threshold_distance)
+	log.info("%i cells detected" % len(cells))
 	
 	# Set X and Y scale to 1
 	imp.getCalibration().pixelWidth = 1
@@ -110,16 +163,27 @@ def main():
 
 	# Iterate over all centrosomes
 	results = []
-	for i, (cen_x, cen_y) in enumerate(centrosomes[:]):
+	for i, cell in enumerate(cells):
 	
-		name = "Cen%i_Kymograph" % (i+1)
-	
-		# Draw line around the centrosomes
-		xpoints, ypoints = get_circle_points(cen_x, cen_y, radius=radius, n=n_points_circle)
-		circle = PolygonRoi(xpoints, ypoints, Roi.POLYLINE)
-		circle.setStrokeWidth(line_width)
-		rm = get_roi_manager(new=True)
-		rm.addRoi(circle)
+		name = "Cell_%i_Kymograph" % (i+1)
+
+		cen1_x = cell['cen1'][0]
+		cen1_y = cell['cen1'][1]
+		cen2_x = None
+		cen2_y = None
+
+		if cell['double']:
+			cen2_x = cell['cen2'][0]
+			cen2_y = cell['cen2'][1]
+			# Draw line both centrosomes
+			# TODO
+		else:
+			# Draw line around the unique centrosome
+			xpoints, ypoints = get_circle_points(cen1_x, cen1_y, radius=radius, n=n_points_circle)
+			circle = PolygonRoi(xpoints, ypoints, Roi.POLYLINE)
+			circle.setStrokeWidth(line_width)
+			rm = get_roi_manager(new=True)
+			rm.addRoi(circle)
 	
 		# Save the ROI
 		rm.runCommand("Save", os.path.join(analysis_dir, name + "_Line_ROI.zip"))
@@ -154,14 +218,11 @@ def main():
 		settings.detectorFactory = DogDetectorFactory()
 		settings.detectorSettings = {
 			'DO_SUBPIXEL_LOCALIZATION' : True,
-			'RADIUS' : radius_detection,
+			'RADIUS' : radius_detection / 2.0,
 			'TARGET_CHANNEL' : 1,
 			'THRESHOLD' : 0.,
 			'DO_MEDIAN_FILTERING' : True,
 		}
-		
-		filter1 = FeatureFilter('QUALITY', 0, True)
-		#settings.addSpotFilter(filter1)
 		
 		trackmate = TrackMate(model, settings)
 		trackmate.checkInput()
@@ -170,32 +231,57 @@ def main():
 		trackmate.computeSpotFeatures(True)
 		trackmate.execSpotFiltering(True)
 		
-		# Do auto threshold
-		# threshold = TMUtils.otsuThreshold( valuesMap.get( selectedFeature ) )
+		# Otsu filtering by quality features
+		quality = [spot.getFeatures()['QUALITY'] for spot in model.getSpots().iterator(True)]
+		threshold = TMUtils.otsuThreshold(quality)
+		featureFilter = FeatureFilter(Spot.QUALITY, threshold, True)
+		spots = model.getSpots()
+		spots.filter(featureFilter)
+		spots = spots.crop()
+		model.setSpots(spots, True)
+
+		# Create, display and save ROIs
+		if model.getSpots().getNSpots(False) > 0:
+			rm = get_roi_manager(new=True)
+			spots = []
+			for spot in model.getSpots().iterator(False):
+				spots.append(spot)
+			
+				x = spot.getFeatures()['POSITION_X']
+				y = spot.getFeatures()['POSITION_Y']
+				spot_radius = spot.getFeatures()['RADIUS']
+			
+				spot_roi = OvalRoi(x - spot_radius/2, y - spot_radius/2, spot_radius * 2, spot_radius * 2)
+				rm.addRoi(spot_roi)
 		
-		rm = get_roi_manager(new=True)
-		
-		spots = []
-		for spot in model.getSpots().iterator(True):
-			spots.append(spot)
-		
-			x = spot.getFeatures()['POSITION_X']
-			y = spot.getFeatures()['POSITION_Y']
-			spot_radius = spot.getFeatures()['RADIUS']
-		
-			spot_roi = OvalRoi(x - spot_radius/2, y - spot_radius/2, spot_radius, spot_radius)
-			rm.addRoi(spot_roi)
-	
-		spots_fname = os.path.join(analysis_dir, name + "_Comets_ROI.zip")
-		rm.runCommand("Save", spots_fname)
-		log.info("Saving detected spots to %s" % (spots_fname))
+			spots_fname = os.path.join(analysis_dir, name + "_Comets_ROI.zip")
+			rm.runCommand("Save", spots_fname)
+			log.info("Saving detected spots to %s" % (spots_fname))
+		else:
+			spots = []
 
 		# Calculate the results
 		timepoints = data.dimension(data.dimensionIndex(Axes.TIME))
 		duration = timepoints * dt
-		events_number = len(spots)
-		rate = (events_number / duration) * 60
-		results.append([os.path.basename(dir_path), i+1, rate, duration, events_number])
+		nucleation_number = len(spots)
+		nucleation_rate = (nucleation_number / duration) * 60
+
+		result = {}
+		result['fname'] = os.path.basename(dir_path)
+		result['cell_id'] = i
+		result['double'] = cell['double']
+		result['cen1_x'] = cell['cen1'][0]
+		result['cen1_y'] = cell['cen1'][1]
+		if cell['double']:
+			result['cen2_x'] = cell['cen2'][0]
+			result['cen2_y'] = cell['cen2'][1]
+		else:
+			result['cen2_x'] = None
+			result['cen2_y'] = None
+		result['nucleation_number'] = nucleation_number
+		result['duration'] = duration
+		result['nucleation_rate'] = nucleation_rate
+		results.append(result)
 
 		if close_windows:
 			kymograph_imp.close()
@@ -206,32 +292,24 @@ def main():
 	rm.runCommand("Reset")
 	
 	# Write results in csv
-	table = ResultsTable() 
-	for row in results:
+	table = ResultsTable()
+	for result in results:
 		table.incrementCounter()
-		table.addValue('Filename', row[0])
-		table.addValue('Centrosome #', row[1])
-		table.addValue('Nucleation Rate (min-1)', row[2])
-		table.addValue('Time (s)', row[3])
-		table.addValue('Nucleation Events', row[4])
+		table.addValue('Filename', result['fname'])
+		table.addValue('Cell ID #', str(result['cell_id']))
+		table.addValue('Nucleation Rate (min-1)', str(result['nucleation_rate']))
+		table.addValue('Time (s)', str(result['duration']))
+		table.addValue('Nucleation Events', str(result['nucleation_number']))
+		table.addValue('double', str(result['double']))
+		table.addValue('cen1_x', str(result['cen1_x']))
+		table.addValue('cen1_y', str(result['cen1_y']))
+		table.addValue('cen2_x', str(result['cen2_x']))
+		table.addValue('cen2_y', str(result['cen2_y']))
 	if show_results:
 		table.show('Results Nucleation Rate')
 	result_fname = os.path.join(analysis_dir, "Results.csv")
 	table.save(result_fname)
 	log.info("Saving final results to %s" % (result_fname))
-
-	# Write centrosomes position in csv
-	table = ResultsTable() 
-	for i, row in enumerate(centrosomes):
-		table.incrementCounter()
-		table.addValue('Centrosome #', i+1)
-		table.addValue('x', row[0])
-		table.addValue('y', row[1])
-	if show_results:
-		table.show('Centrosomes Positions')
-	cen_fname = os.path.join(analysis_dir, "Centrosomes_Position.csv")
-	table.save(cen_fname)
-	log.info("Saving centrosomes position to %s" % (cen_fname))
 
 	# Write parameters in csv
 	table = ResultsTable() 
@@ -250,8 +328,8 @@ def main():
 	table.incrementCounter()
 	table.addValue('Value', "radius_detection")
 	table.addValue('Key', radius_detection)
-	if show_results:
-		table.show('Parameters')
+	table.addValue('Value', "cen_threshold_distance")
+	table.addValue('Key', cen_threshold_distance)
 	para_fname = os.path.join(analysis_dir, "Parameters.csv")
 	table.save(para_fname)
 	log.info("Saving parameters to %s" % (para_fname))
