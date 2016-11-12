@@ -60,6 +60,7 @@ from ij.gui import OvalRoi
 from ij.measure import Calibration
 from ij.measure import ResultsTable
 from ij import IJ
+from ij.plugin.filter import DifferenceOfGaussians
 
 from java.awt import Polygon
 
@@ -114,9 +115,6 @@ def get_circle_points(x_center, y_center, radius, n=20):
 	
 def get_two_circles_points(x1, y1, x2, y2, radius, n=20):
 	xcen, ycen = (x1 + x2) / 2, (y1 + y2) / 2
-	
-	#radius = math.sqrt((x1 - xcen)**2 + (y1 - ycen)**2)
-	#radius *= 1.1
 	
 	points1 = get_circle_points(x1, y1, radius, n=n)
 	points2 = get_circle_points(x2, y2, radius, n=n)
@@ -189,7 +187,7 @@ def main():
 	fname = data.getSource()
 	dir_path = os.path.dirname(fname)
 	
-	analysis_dir = os.path.join(dir_path, "Analysis")
+	analysis_dir = os.path.join(dir_path, "Analysis_Nucleation")
 	if not os.path.exists(analysis_dir):
 		os.makedirs(analysis_dir)
 	else:
@@ -208,6 +206,13 @@ def main():
 	z_fname = os.path.join(analysis_dir, "Z_Projection.tif")
 	io.save(z_projected, z_fname)
 	log.info("Saving Z Projection to %s" % (z_fname))
+
+	# Apply DOG Filtering
+	sigma1 = 4.2
+	sigma2 = 1.25
+	# TODO
+
+	preprocessed_dataset = z_projected
 
 	# Iterate over all centrosomes
 	results = []
@@ -240,7 +245,7 @@ def main():
 		rm.runCommand("Reset")
 	
 		# Create kymograph
-		kfactory = KFactory(ij.context(), z_projected, circle)
+		kfactory = KFactory(ij.context(), preprocessed_dataset, circle)
 		kfactory.build()
 		kymograph = kfactory.getKymograph()
 	
