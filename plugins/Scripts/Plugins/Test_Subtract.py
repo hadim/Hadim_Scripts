@@ -7,9 +7,11 @@ from net.imagej.ops import Ops
 from net.imglib2.type.numeric.integer import UnsignedShortType
 from net.imglib2.type.numeric.integer import ShortType
 from net.imglib2.type.numeric.integer import IntType
+from  net.imglib2.type.numeric.real import FloatType
 
 # Convert input
-converted = ij.op().convert().int32(data.getImgPlus())
+pixel_type = data.getImgPlus().firstElement().class
+converted = ij.op().convert().float32(data.getImgPlus())
 
 # Get the first frame (TODO: find a faser way !)
 t_dim = data.dimensionIndex(Axes.TIME)
@@ -40,6 +42,12 @@ fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
 # Run the op
 ij.op().slice(subtracted, converted, sub_op, fixed_axis)
 
+# Remove values below 0 and above maximum type value by clipping
+clip_op = ij.op().op("convert.clip", IntType(0), IntType(255))
+ij.op().map(subtracted, clip_op)
+
 # Show it
 #subtracted = ij.op().convert().uint8(subtracted)
 ij.ui().show("subtracted", subtracted)
+
+print(pixel_type().getMaxValue())
