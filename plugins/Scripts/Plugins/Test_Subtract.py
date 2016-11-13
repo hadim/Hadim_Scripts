@@ -1,27 +1,45 @@
 # @ImageJ ij
 # @Dataset data
-# @ImagePlus imp
 
-from ij.plugin.filter import DifferenceOfGaussians
-from ij.plugin import ContrastEnhancer
-from ij.plugin import Duplicator
+from net.imglib2.util import Intervals
+from net.imagej.axis import Axes
+from net.imagej.ops import Ops
+from net.imglib2.type.numeric.integer import UnsignedShortType
+from net.imglib2.type.numeric.integer import ShortType
+from net.imglib2.type.numeric.integer import IntType
 
-sigma1 = 4.2
-sigma2 = 1.25
-
-# IJ Ops version
-
+# Convert input
 converted = ij.op().convert().int32(data.getImgPlus())
-dog = ij.op().run("filter.dog", converted, sigma1, sigma2)
-ij.ui().show("dog", dog)
 
-# GDSC Plugin version
-out = Duplicator().run(imp)
-f = DifferenceOfGaussians()
-f.setup("", out)
+# Get the first frame (TODO: find a faser way !)
+t_dim = data.dimensionIndex(Axes.TIME)
+interval_start = []
+interval_end = []
+for d in range(0, data.numDimensions()):
+	if d != t_dim:
+		interval_start.append(0)
+		interval_end.append(data.dimension(d) - 1)
+	else:
+		interval_start.append(0)
+		interval_end.append(0)
+		
+intervals = interval_start + interval_end
+intervals = Intervals.createMinMax(*intervals)
 
-for i in range(1, out.getNFrames()+1):
-	out.setPosition(i)
-	f.run(out.getProcessor(), sigma1, sigma2)
+first_frame = ij.op().transform().crop(converted, intervals)
 
-out.show()
+# Allocate output memory (wait for hybrid CF version of slice)
+subtracted = ij.op().create().img(converted)
+
+# Create the op
+sub_op =  ij.op().op("math.subtract", first_frame, first_frame)
+
+# Setup the fixed axis
+fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
+
+# Run the op
+ij.op().slice(subtracted, converted, sub_op, fixed_axis)
+
+# Show it
+#subtracted = ij.op().convert().uint8(subtracted)
+ij.ui().show("subtracted", subtracted)
