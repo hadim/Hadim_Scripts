@@ -8,7 +8,10 @@ from net.imglib2.type.numeric.integer import UnsignedShortType
 from net.imglib2.type.numeric.integer import ShortType
 from net.imglib2.type.numeric.integer import IntType
 
-# Get the first frame
+# Convert input
+converted = ij.op().convert().int32(data.getImgPlus())
+
+# Get the first frame (TODO: find a faser way !)
 t_dim = data.dimensionIndex(Axes.TIME)
 interval_start = []
 interval_end = []
@@ -23,18 +26,20 @@ for d in range(0, data.numDimensions()):
 intervals = interval_start + interval_end
 intervals = Intervals.createMinMax(*intervals)
 
-first_frame = ij.op().transform().crop(data.getImgPlus(), intervals)
-#ij.ui().show("first_frame", first_frame)
+first_frame = ij.op().transform().crop(converted, intervals)
 
-# Subtract the first frame to the stack
-pixel_type = data.getImgPlus().firstElement().__class__
-subtracted = ij.op().create().img(data.getImgPlus(), IntType())
+# Allocate output memory (wait for hybrid CF version of slice)
+subtracted = ij.op().create().img(converted)
+
+# Create the op
 sub_op =  ij.op().op("math.subtract", first_frame, first_frame)
 
+# Setup the fixed axis
 fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
-print(fixed_axis)
 
-ij.op().slice(subtracted, data.getImgPlus(), sub_op, fixed_axis)
+# Run the op
+ij.op().slice(subtracted, converted, sub_op, fixed_axis)
+
+# Show it
+#subtracted = ij.op().convert().uint8(subtracted)
 ij.ui().show("subtracted", subtracted)
-
-print(data.getImgPlus().firstElement().__class__)
