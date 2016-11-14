@@ -6,6 +6,12 @@
 # @ImageJ ij
 # @ImagePlus imp
 
+# Script TODO are :
+#
+# - Preprocess Image : DOG + Rosin thresholding
+# - Create Comet Average from ROIs or TrackMate file
+# - Template Matching with TrackMate spots and Comet Average
+
 from ij.plugin.filter import DifferenceOfGaussians
 from ij.plugin import ContrastEnhancer
 from ij.plugin import Duplicator
@@ -42,7 +48,7 @@ f.setup("", imp)
 for i in range(1, imp.getNFrames()+1):
 	imp.setPosition(i)
 	f.run(imp.getProcessor(), sigma1, sigma2)
-	
+
 final_imp = imp
 
 # Apply unimodal compatible thresholding (IJ1 default method)
@@ -50,27 +56,27 @@ final_imp = imp
 if do_thresholding:
 
 	binary_stack = ImageStack.create(imp.getWidth(), imp.getHeight(), imp.getType(), imp.getBitDepth())
-	
+
 	for i in range(1, imp.getNFrames() + 1):
 		imp.setPosition(i)
 		ip = imp.getProcessor().duplicate()
-	
+
 		ip = ip.convertToShort(False)
 		ip.setAutoThreshold(AutoThresholder.Method.Otsu, False)
 		ip.threshold(ip.getAutoThreshold())
-	
+
 		ip = ip.convertToByteProcessor(True)
 		ip.invert()
-		
-		binary_stack.addSlice(ip)	
-	
+
+		binary_stack.addSlice(ip)
+
 	binary_stack.deleteSlice(1)
 	binary_imp = ImagePlus("Binary", binary_stack)
 	if show_images:
 		binary_imp.show()
 
 	# Subtract binary stack to DOG filtered stack
-	
+
 	calc = ImageCalculator()
 	subtracted_imp = calc.run("subtract create stack", imp, binary_imp)
 	subtracted_imp.show()
