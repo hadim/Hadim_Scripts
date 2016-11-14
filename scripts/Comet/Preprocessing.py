@@ -10,7 +10,7 @@ from net.imagej.ops import Ops
 
 # Parameters
 show_images = False
-save_images = True
+save_images = False
 
 sigma1 = 4.2
 sigma2 = 1.25
