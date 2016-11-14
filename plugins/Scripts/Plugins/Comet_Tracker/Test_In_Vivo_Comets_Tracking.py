@@ -8,9 +8,10 @@
 
 # Script TODO are :
 #
-# - Preprocess Image : DOG + Rosin thresholding
+# - Preprocess Image : DOG + Rosin thresholding + Apply mask
 # - Create Comet Average from ROIs or TrackMate file
 # - Template Matching with TrackMate spots and Comet Average
+# - Track with Kalman Tracker
 
 from ij.plugin.filter import DifferenceOfGaussians
 from ij.plugin import ContrastEnhancer
