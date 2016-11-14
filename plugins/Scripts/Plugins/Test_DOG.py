@@ -13,6 +13,7 @@ sigma2 = 1.25
 
 # IJ Ops version
 
+pixel_type = data.getImgPlus().firstElement().class
 converted = ij.op().convert().float32(data.getImgPlus())
 
 # Allocate output memory (wait for hybrid CF version of slice)
@@ -28,8 +29,12 @@ fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
 # Run the op
 ij.op().slice(dog, converted, dog_op, fixed_axis)
 
+clip_op = ij.op().op("convert.clip", converted.firstElement().class(), converted.firstElement().class())
+clipped = ij.op().create().img(dog)
+ij.op().map(clipped, dog, clip_op)
+
 # Show it
-ij.ui().show("dog", dog)
+ij.ui().show("dog", clipped)
 
 # GDSC Plugin version
 out = Duplicator().run(imp)

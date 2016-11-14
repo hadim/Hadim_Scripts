@@ -8,6 +8,7 @@ from net.imglib2.type.numeric.integer import UnsignedShortType
 from net.imglib2.type.numeric.integer import ShortType
 from net.imglib2.type.numeric.integer import IntType
 from  net.imglib2.type.numeric.real import FloatType
+from net.imagej.ops.convert.clip import ClipRealTypes
 
 # Convert input
 pixel_type = data.getImgPlus().firstElement().class
@@ -43,11 +44,10 @@ fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
 ij.op().slice(subtracted, converted, sub_op, fixed_axis)
 
 # Remove values below 0 and above maximum type value by clipping
-clip_op = ij.op().op("convert.clip", IntType(0), IntType(255))
-ij.op().map(subtracted, clip_op)
+clip_op = ij.op().op("convert.clip", pixel_type(), subtracted.firstElement().class())
+clipped = ij.op().create().img(subtracted)
+ij.op().map(clipped, subtracted, clip_op)
 
 # Show it
 #subtracted = ij.op().convert().uint8(subtracted)
-ij.ui().show("subtracted", subtracted)
-
-print(pixel_type().getMaxValue())
+ij.ui().show("subtracted", clipped)
