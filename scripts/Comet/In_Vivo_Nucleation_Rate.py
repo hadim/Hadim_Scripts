@@ -3,7 +3,7 @@
 # @Integer(label="Line Width for Kymo Line (pixel)", required=true, value=4) line_width
 # @Integer(label="Radius of the line to make the kymograph (pixel)", required=true, value=25) radius
 # @Float(label="Radius (for comet detection on kymograph) (pixel)", required=true, value=5) radius_detection
-# @Boolean(label="Close all opened window after processing ?", value=False) close_windows
+# @Boolean(label="Show images ?", value=False) show_images
 # @Boolean(label="Show Results Tables ?", value=True) show_results
 
 # @ImageJ ij
@@ -86,19 +86,74 @@ def combinations(iterable, r):
             indices[j] = indices[j-1] + 1
         yield tuple(pool[i] for i in indices)
 
-def z_project(data):
-	z_dim = data.dimensionIndex(Axes.Z)
-	if data.dimension(z_dim) == 1:
-		return data
-	projected_dimensions = [data.dimension(d) for d in range(0, data.numDimensions()) if d != z_dim]
-	axis = [data.axis(d) for d in range(0, data.numDimensions()) if d != z_dim]
-	z_projected = ops.create().img(projected_dimensions)
-	max_op = ops.op(Ops.Stats.Max, data)
-	ops.transform().project(z_projected, data, max_op, z_dim)
-	z_projected = ij.dataset().create(z_projected)
-	z_projected.setAxes(axis)
-	return z_projected
 
+def do_z_projection(data, save=False, output_dir=""):
+	# Select which dimension to project
+	z_dim = data.dimensionIndex(Axes.Z)
+
+	if z_dim == -1:
+		log.info("Z dimension not found. Z Projection skipped.")
+		output = data.duplicate()
+	elif data.dimension(z_dim) == 1:
+		log.info("Z dimension has only one frame. Z Projection skipped.")
+		output = data.duplicate()
+	else:
+		log.info("Performing Z maximum projection")
+	
+		# Write the output dimensions
+		projected_dimensions = [data.dimension(d) for d in range(0, data.numDimensions()) if d != z_dim]
+	
+		# Create the output image
+		z_projected = ij.op().create().img(projected_dimensions)
+	
+		# Create the op and run it
+		max_op = ij.op().op(Ops.Stats.Max, data)
+		ij.op().transform().project(z_projected, data, max_op, z_dim)
+	
+		# Create a dataset
+		output = ij.dataset().create(z_projected)
+	
+		# Set the correct axes (is that needed ?)
+		axes = [data.axis(d) for d in range(0, data.numDimensions()) if d != z_dim]
+		output.setAxes(axes)
+
+	if save:
+		fname = os.path.join(output_dir, "Z_Projected.tif")
+		log.info("Saving at %s" % fname)
+		output.setSource(fname)
+		ij.io().save(output, fname)
+
+
+def apply_dog_filter(data, sigma1, sigma2, save=False, output_dir=""):
+
+	log.info("Applying DOG filter with sigma1 = %f and sigma2 = %f" % (sigma1, sigma2))
+
+	pixel_type = data.getImgPlus().firstElement().class
+	converted = ij.op().convert().float32(data.getImgPlus())
+	
+	# Allocate output memory (wait for hybrid CF version of slice)
+	dog = ij.op().create().img(converted)
+	
+	# Create the op
+	dog_op = ij.op().op("filter.dog", converted, sigma1, sigma2)
+	
+	# Setup the fixed axis
+	t_dim = data.dimensionIndex(Axes.TIME)
+	fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
+	
+	# Run the op
+	ij.op().slice(dog, converted, dog_op, fixed_axis)
+
+	output = ij.dataset().create(dog)
+
+	if save:
+		fname = os.path.join(output_dir, "DOG_Filtered.tif")
+		log.info("Saving at %s" % fname)
+		output.setSource(fname)
+		ij.io().save(output, fname)
+
+	return output
+	
 
 def in_circle(point, center, radius):
 	return ((point[0] - center[0])**2 + (point[1] - center[1])**2) < radius**2
@@ -136,6 +191,7 @@ def get_roi_manager(new=False):
 		rm.runCommand("Reset")
 	return rm
 
+
 def get_cells(centrosomes, cen_threshold_distance):
 	# Check centrosomes close together and add them as a 'cell' dict
 	cells = []
@@ -163,6 +219,7 @@ def get_cells(centrosomes, cen_threshold_distance):
 			cells.append(cell)
 	return cells
 		
+
 ## Main Code
 
 def main():
@@ -190,22 +247,11 @@ def main():
 	analysis_dir = os.path.join(dir_path, "Analysis_Nucleation")
 	if not os.path.exists(analysis_dir):
 		os.makedirs(analysis_dir)
-	else:
-		try:
-			for root, dirs, files in os.walk(analysis_dir):
-			    for f in files:
-			        os.remove(os.path.join(root, f))
-			    for d in dirs:
-			        shutil.rmtree(os.path.join(root, d))
-		except OSError:
-			pass
 	
 	# Do Z Projection
-	z_projected = z_project(data)
-	ij.ui().show("Z_Projection.tif", z_projected)
-	z_fname = os.path.join(analysis_dir, "Z_Projection.tif")
-	io.save(z_projected, z_fname)
-	log.info("Saving Z Projection to %s" % (z_fname))
+	z_projected = do_z_projection(data, save=save_images, output_dir=output_dir)
+	if show_images:
+		ij.ui().show("z_projected", z_projected)
 
 	# Apply DOG Filtering
 	sigma1 = 4.2

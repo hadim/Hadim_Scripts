@@ -4,13 +4,9 @@ A set of plugins/macros/script for Fiji.
 
 Use it, hack it, share it.
 
-## Install
-
-```sh
-sh install.sh /path/to/fiji/Fiji.app
-```
-
 ## Usage
+
+Warning : some scripts may need the `ij2-python-tool` plugin : https://github.com/hadim/ij2-python-lib.
 
 ### Scripts
 
@@ -19,10 +15,6 @@ sh install.sh /path/to/fiji/Fiji.app
 - Kymograph.py : work in progress
 - Kymograph_Comet_Velocity.py : get length, duration and speed of comet from kymograph
 - ... and many [mores](./scripts)
-
-### Macros
-
-See [custom-macros.ijm](./macros/custom-macros.ijm).
 
 # License
 
