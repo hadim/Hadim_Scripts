@@ -34,7 +34,7 @@ clipped = ij.op().create().img(dog)
 ij.op().map(clipped, dog, clip_op)
 
 # Show it
-ij.ui().show("dog", clipped)
+ij.ui().show("dog", dog)
 
 # GDSC Plugin version
 out = Duplicator().run(imp)
