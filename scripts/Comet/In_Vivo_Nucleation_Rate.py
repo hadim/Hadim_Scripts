@@ -3,7 +3,9 @@
 # @Integer(label="Line Width for Kymo Line (pixel)", required=true, value=4) line_width
 # @Integer(label="Radius of the line to make the kymograph (pixel)", required=true, value=25) radius
 # @Float(label="Radius (for comet detection on kymograph) (pixel)", required=true, value=5) radius_detection
+# @Float(label="Threshold adjuster", required=true, value=1.0) ktresh
 # @Boolean(label="Show images ?", value=False) show_images
+# @Boolean(label="Save intermediates images ?", value=True) save_images
 # @Boolean(label="Show Results Tables ?", value=True) show_results
 
 # @ImageJ ij
@@ -53,144 +55,24 @@ import fiji.plugin.trackmate.features.FeatureFilter as FeatureFilter
 from fiji.plugin.trackmate.util import TMUtils
 import fiji.plugin.trackmate.features.FeatureFilter as FeatureFilter
 
-from ij.plugin.frame import RoiManager
 from ij.gui import Roi
 from ij.gui import PolygonRoi
 from ij.gui import OvalRoi
 from ij.measure import Calibration
 from ij.measure import ResultsTable
 from ij import IJ
-from ij.plugin.filter import DifferenceOfGaussians
 
 from java.awt import Polygon
 
+from ij2_tools import do_z_projection
+from ij2_tools import apply_dog_filter
+from ij2_tools.geometry import get_circle_points
+from ij2_tools.geometry import get_two_circles_points
+from ij2_tools.utils import combinations
+from ij2_tools.ij1 import get_roi_manager
+
+
 ## Functions
-
-def combinations(iterable, r):
-    # combinations('ABCD', 2) --> AB AC AD BC BD CD
-    # combinations(range(4), 3) --> 012 013 023 123
-    pool = tuple(iterable)
-    n = len(pool)
-    if r > n:
-        return
-    indices = list(range(r))
-    yield tuple(pool[i] for i in indices)
-    while True:
-        for i in reversed(range(r)):
-            if indices[i] != i + n - r:
-                break
-        else:
-            return
-        indices[i] += 1
-        for j in range(i+1, r):
-            indices[j] = indices[j-1] + 1
-        yield tuple(pool[i] for i in indices)
-
-
-def do_z_projection(data, save=False, output_dir=""):
-	# Select which dimension to project
-	z_dim = data.dimensionIndex(Axes.Z)
-
-	if z_dim == -1:
-		log.info("Z dimension not found. Z Projection skipped.")
-		output = data.duplicate()
-	elif data.dimension(z_dim) == 1:
-		log.info("Z dimension has only one frame. Z Projection skipped.")
-		output = data.duplicate()
-	else:
-		log.info("Performing Z maximum projection")
-	
-		# Write the output dimensions
-		projected_dimensions = [data.dimension(d) for d in range(0, data.numDimensions()) if d != z_dim]
-	
-		# Create the output image
-		z_projected = ij.op().create().img(projected_dimensions)
-	
-		# Create the op and run it
-		max_op = ij.op().op(Ops.Stats.Max, data)
-		ij.op().transform().project(z_projected, data, max_op, z_dim)
-	
-		# Create a dataset
-		output = ij.dataset().create(z_projected)
-	
-		# Set the correct axes (is that needed ?)
-		axes = [data.axis(d) for d in range(0, data.numDimensions()) if d != z_dim]
-		output.setAxes(axes)
-
-	if save:
-		fname = os.path.join(output_dir, "Z_Projected.tif")
-		log.info("Saving at %s" % fname)
-		output.setSource(fname)
-		ij.io().save(output, fname)
-
-
-def apply_dog_filter(data, sigma1, sigma2, save=False, output_dir=""):
-
-	log.info("Applying DOG filter with sigma1 = %f and sigma2 = %f" % (sigma1, sigma2))
-
-	pixel_type = data.getImgPlus().firstElement().class
-	converted = ij.op().convert().float32(data.getImgPlus())
-	
-	# Allocate output memory (wait for hybrid CF version of slice)
-	dog = ij.op().create().img(converted)
-	
-	# Create the op
-	dog_op = ij.op().op("filter.dog", converted, sigma1, sigma2)
-	
-	# Setup the fixed axis
-	t_dim = data.dimensionIndex(Axes.TIME)
-	fixed_axis = [d for d in range(0, data.numDimensions()) if d != t_dim]
-	
-	# Run the op
-	ij.op().slice(dog, converted, dog_op, fixed_axis)
-
-	output = ij.dataset().create(dog)
-
-	if save:
-		fname = os.path.join(output_dir, "DOG_Filtered.tif")
-		log.info("Saving at %s" % fname)
-		output.setSource(fname)
-		ij.io().save(output, fname)
-
-	return output
-	
-
-def in_circle(point, center, radius):
-	return ((point[0] - center[0])**2 + (point[1] - center[1])**2) < radius**2
-	
-
-def get_circle_points(x_center, y_center, radius, n=20):
-		points = []
-		for i in range(0, n+1):
-			x = math.cos(2*math.pi/n*i) * radius + x_center
-			y =  math.sin(2*math.pi/n*i) * radius + y_center
-			points.append([x, y])
-		return points
-	
-	
-def get_two_circles_points(x1, y1, x2, y2, radius, n=20):
-	xcen, ycen = (x1 + x2) / 2, (y1 + y2) / 2
-	
-	points1 = get_circle_points(x1, y1, radius, n=n)
-	points2 = get_circle_points(x2, y2, radius, n=n)
-	
-	points1_in_circle_index = [i for i, point in enumerate(points1) if in_circle(point, [x2, y2], radius)]
-	points2_in_circle_index = [i for i, point in enumerate(points2) if in_circle(point, [x1, y1], radius)]
-	
-	points1 = points1[points1_in_circle_index[-1] + 1:] + points1[:points1_in_circle_index[0]]
-	points2 = points2[points2_in_circle_index[-1] + 1:] + points2[:points2_in_circle_index[0]]
-
-	return points1 + points2
-
-
-def get_roi_manager(new=False):
-	rm = RoiManager.getInstance()
-	if not rm:
-		rm = RoiManager()
-	if new:
-		rm.runCommand("Reset")
-	return rm
-
 
 def get_cells(centrosomes, cen_threshold_distance):
 	# Check centrosomes close together and add them as a 'cell' dict
@@ -249,14 +131,16 @@ def main():
 		os.makedirs(analysis_dir)
 	
 	# Do Z Projection
-	z_projected = do_z_projection(data, save=save_images, output_dir=output_dir)
+	z_projected = do_z_projection(ij, data, save=save_images, output_dir=analysis_dir)
 	if show_images:
 		ij.ui().show("z_projected", z_projected)
 
 	# Apply DOG Filtering
-	sigma1 = 4.2
-	sigma2 = 1.25
-	# TODO
+	#sigma1 = 4.2
+	#sigma2 = 1.25
+	#dog = apply_dog_filter(ij, z_projected, sigma1, sigma2, save=save_images, output_dir=analysis_dir)
+	#if show_images:
+	#	ij.ui().show("dog", dog)
 
 	preprocessed_dataset = z_projected
 
@@ -335,6 +219,7 @@ def main():
 		# Otsu filtering by quality features
 		quality = [spot.getFeatures()['QUALITY'] for spot in model.getSpots().iterator(True)]
 		threshold = TMUtils.otsuThreshold(quality)
+		threshold *= ktresh
 		featureFilter = FeatureFilter(Spot.QUALITY, threshold, True)
 		spots = model.getSpots()
 		spots.filter(featureFilter)
@@ -384,10 +269,10 @@ def main():
 		result['nucleation_rate'] = nucleation_rate
 		results.append(result)
 
-		if close_windows:
+		if not show_images:
 			kymograph_imp.close()
 
-	if close_windows:
+	if not show_images:
 		IJ.selectWindow("Z_Projection.tif")
 		IJ.getImage().close()
 	rm = get_roi_manager(new=True)
