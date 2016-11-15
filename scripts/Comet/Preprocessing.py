@@ -11,10 +11,11 @@ from net.imagej.ops import Ops
 from ij2_tools import do_z_projection
 from ij2_tools import apply_dog_filter
 from ij2_tools import do_threshold
+from ij2_tools import subtract_first_image
 
 
 # Parameters
-show_images = False
+show_images = True
 save_images = False
 
 sigma1 = 4.2
@@ -26,14 +27,18 @@ output_dir = os.path.join(os.path.dirname(data.getSource()), "Analysis_Comets")
 if not os.path.exists(output_dir):
 	os.makedirs(output_dir)
 
-
 ## Z Projection
 z_projected = do_z_projection(ij, data, save=save_images, output_dir=output_dir)
 if show_images:
 	ij.ui().show("z_projected", z_projected)
 
+# Subtract stack to its first image
+subtracted = subtract_first_image(ij, z_projected, save=save_images, output_dir=output_dir)
+if show_images:
+	ij.ui().show("subtracted", subtracted)
+
 ## DOG Filtering
-dog = apply_dog_filter(ij, z_projected, sigma1, sigma2, save=save_images, output_dir=output_dir)
+dog = apply_dog_filter(ij, subtracted, sigma1, sigma2, save=save_images, output_dir=output_dir)
 if show_images:
 	ij.ui().show("dog", dog)
 

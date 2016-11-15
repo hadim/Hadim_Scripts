@@ -28,8 +28,8 @@
 #	3. Aplly DOG filtering (band pass filter on the object of interest
 # Step 5 : For each cell, do :
 #	1. Calculate the circle points around a unique centrosome or the glasses shape points when two centrosomes.
-#	2. Save the points are a ROI zip file.
-#	3. Compute kymograph and save it on disk.
+#	2. Save the ROI around the centrosomes as a zip file.
+#	3. Compute kymograph and save it.
 #	4. Subtract background on the kymograph.
 #	5. Detecte spots (nucleation event) on the kymograph.
 #	6. Filter spots using Otsu threshold method.
