@@ -4,8 +4,8 @@
 # @Integer(label="KYMOGRAPH | Number of points", required=true, value=30) n_points_circle
 # @Integer(label="KYMOGRAPH | Line Width (pixel)", required=true, value=4) line_width
 # @Integer(label="KYMOGRAPH | Radius of the line (pixel)", required=true, value=25) radius
-# @Float(label="DETECTION | Radius (pixel)", required=true, value=2, stepSize=0.1) radius_detection
-# @Float(label="DETECTION | Relative threshold", required=true, value=1.0, stepSize=0.1) relative_threshold
+# @Float(label="DETECTION | Radius (pixel)", required=true, value=2.5, stepSize=0.1) radius_detection
+# @Float(label="DETECTION | Relative threshold", required=true, value=0.7, stepSize=0.1) relative_threshold
 # @Boolean(label="Show images ?", value=False) show_images
 # @Boolean(label="Save intermediates images ?", value=True) save_images
 # @Boolean(label="Show Results Tables ?", value=True) show_results
@@ -148,7 +148,7 @@ def main():
 	# Iterate over all centrosomes
 	results = []
 	for i, cell in enumerate(cells):
-	
+
 		name = "Cell_%i_Kymograph" % (i+1)
 
 		cen1_x = cell['cen1'][0]
@@ -194,9 +194,8 @@ def main():
 			ij.ui().show(kymo_fname, kymograph)
 
 		# Track spots
-		print_info(kymograph)
 		spots = dog_detector(ij, kymograph, radius=radius_detection, relative_threshold=relative_threshold,
-							 doSubpixel=True, doMedian=True, calibration=[1, 1, 1])
+							 doSubpixel=True, doMedian=False, calibration=[1, 1, 1])
 
 		if len(spots) > 0:
 			rm = get_roi_manager(new=True)
