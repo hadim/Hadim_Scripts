@@ -214,7 +214,7 @@ def main():
 
 		result = {}
 		result['fname'] = os.path.basename(dir_path)
-		result['cell_id'] = i + 1
+		result['cell_id'] = i + 1
 		result['double'] = cell['double']
 		result['cen1_x'] = cell['cen1'][0]
 		result['cen1_y'] = cell['cen1'][1]
