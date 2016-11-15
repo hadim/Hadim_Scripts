@@ -42,6 +42,4 @@ for label in region_labels:
 		z = center.getDoublePosition(2)
 		roi.setPosition(int(z))
 	
-	#rm.addRoi(roi)
-
-print(region.size())
+	rm.addRoi(roi)
