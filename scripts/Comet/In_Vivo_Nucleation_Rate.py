@@ -59,7 +59,7 @@ from ij import IJ
 
 from java.awt import Polygon
 
-from ij2_tools import do_z_projection
+from ij2_tools import do_projection
 from ij2_tools import apply_dog_filter
 from ij2_tools import subtract_first_image
 from ij2_tools.geometry import get_circle_points
@@ -129,7 +129,7 @@ def main():
 		os.makedirs(analysis_dir)
 	
 	# Do Z Projection
-	z_projected = do_z_projection(ij, data, save=save_images, output_dir=analysis_dir)
+	z_projected = do_projection(ij, data, axis_type="Z", method="Max", save=save_images, output_dir=analysis_dir)
 	if show_images:
 		ij.ui().show("z_projected", z_projected)
 
