@@ -96,11 +96,15 @@ for t in range(thresholded.dimension(axis)):
 		             'Y' : rect[1]}
 		
 		patch = crop(ij, ij.dataset().create(frame_raw), intervals)
-		# TODO : Do the rotation
+		patch = rotate_stack(ij, patch, orientation)
 		patches_list.append(patch)
 
 # Stack the patches
+axis_types = [Axes.X, Axes.Y, Axes.TIME]
+from net.imagej import ImgPlus
+
 patches = Views.stack(patches_list)
+print(patches)
 
 intervals_start = [patch.min(d) for d in range(0, patch.numDimensions())]
 intervals_end = [patch.max(d) for d in range(0, patch.numDimensions())]
@@ -108,10 +112,13 @@ intervals_start += [0]
 intervals_end += [len(patches_list)]
 finalIntervals = Intervals.createMinMax(*(intervals_start + intervals_end))
 patches = ij.op().run("transform.intervalView", patches, finalIntervals)
-patches = ij.dataset().create(patches)
+print(patches)
 
-if show_images:
-	ij.ui().show("patches", patches)
+#patches = ij.dataset().create(patches)
+	
+print(patches)
+
+ij.ui().show("patches", patches)
 
 if save_images:
     fname = os.path.join(output_dir, "Patches.tif")
@@ -119,8 +126,8 @@ if save_images:
     ij.io().save(patches, fname)
 
 # Do the mean of all the patches = average comet
-mean_patch = do_projection(ij, patches, axis_type="TIME", method="Mean", save=save_images, output_dir=output_dir)
-ij.ui().show("mean_patch", mean_patch)
+#mean_patch = do_projection(ij, patches, axis_type="X", method="Mean", save=save_images, output_dir=output_dir)
+#ij.ui().show("mean_patch", mean_patch)
 
 # Compute correlation between each patches and mean_patch
 
