@@ -73,9 +73,12 @@ for t in range(thresholded.dimension(axis)):
 	frame_raw = crop(ij, masked, {"TIME": [t, t]})
 
 	# Analyze particles
-	labeled_img = ij.op().run("cca", frame_masked, StructuringElement.EIGHT_CONNECTED)
-	labelRegions = LabelRegions(labeled_img)
-	regions_frame = [labelRegions.getLabelRegion(label) for label in labelRegions.getExistingLabels()]
+	try:
+		labeled_img = ij.op().run("cca", frame_masked, StructuringElement.EIGHT_CONNECTED)
+		labelRegions = LabelRegions(labeled_img)
+		regions_frame = [labelRegions.getLabelRegion(label) for label in labelRegions.getExistingLabels()]
+	except Exception:
+		regions_frame = []
 
 	log.info("Get %i particles on frame %i" % (len(regions_frame), t))
 
@@ -89,28 +92,35 @@ for t in range(thresholded.dimension(axis)):
 		orientation = 0
 
 		rect = [[int(round(p - (patch_size//2))), int(round((p + patch_size//2)))] for p in origin]
-		print(rect)
 		intervals = {'X' : rect[0],
 		             'Y' : rect[1]}
 		
-		patch = crop(ij, frame_raw, intervals)
-		patch.setName("Frame_%0.4d_Patch_%0.4d" % (t, i))
-
-		patches_list.append(patch.getImgPlus())
+		patch = crop(ij, ij.dataset().create(frame_raw), intervals)
+		# TODO : Do the rotation
+		patches_list.append(patch)
 
 # Stack the patches
 patches = Views.stack(patches_list)
-ij.ui().show("patches", patches)
 
-#if save_images:
-#    fname = os.path.join(output_dir, "Patches.tif")
-#    ij.log().info("Saving at %s" % fname)
-#    ij.io().save(patches, fname)
+intervals_start = [patch.min(d) for d in range(0, patch.numDimensions())]
+intervals_end = [patch.max(d) for d in range(0, patch.numDimensions())]
+intervals_start += [0]
+intervals_end += [len(patches_list)]
+finalIntervals = Intervals.createMinMax(*(intervals_start + intervals_end))
+patches = ij.op().run("transform.intervalView", patches, finalIntervals)
+patches = ij.dataset().create(patches)
+
+if show_images:
+	ij.ui().show("patches", patches)
+
+if save_images:
+    fname = os.path.join(output_dir, "Patches.tif")
+    ij.log().info("Saving at %s" % fname)
+    ij.io().save(patches, fname)
 
 # Do the mean of all the patches = average comet
-#mean_patch = do_projection(ij, patches, axis_type="TIME", method="Mean", save=save_images, output_dir=output_dir)
-#if show_images:
-#	ij.ui().show("mean_patch", patches)
+mean_patch = do_projection(ij, patches, axis_type="TIME", method="Mean", save=save_images, output_dir=output_dir)
+ij.ui().show("mean_patch", mean_patch)
 
 # Compute correlation between each patches and mean_patch
 
