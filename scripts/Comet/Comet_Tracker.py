@@ -104,7 +104,6 @@ axis_types = [Axes.X, Axes.Y, Axes.TIME]
 from net.imagej import ImgPlus
 
 patches = Views.stack(patches_list)
-print(patches)
 
 intervals_start = [patch.min(d) for d in range(0, patch.numDimensions())]
 intervals_end = [patch.max(d) for d in range(0, patch.numDimensions())]
