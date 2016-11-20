@@ -3,6 +3,7 @@
 # @Float(label="PREPROCESSING | DOG Sigma 1 (um)", required=false, value=0.400, stepSize=0.01) sigma1_um
 # @Float(label="PREPROCESSING | DOG Sigma 2 (um)", required=true, value=0.120, stepSize=0.01) sigma2_um
 # @Float(label="KYMOGRAPH | Circle Diameter (um)", required=true, value=4.5, stepSize=0.1) diameter_kymograph_um
+# @Float(label="DETECTION | Spot Diameter", required=true, value=0.400, stepSize=0.01) diameter_spot_detection_um
 # @Float(label="DETECTION | Threshold", required=true, value=25, stepSize=1) threshold_detection
 # @String(label="Show images ?", style="radioButtonHorizontal", choices={ "All","Only Kymographs", "None" }) show_images
 # @Boolean(label="Save intermediates images ?", value=True) save_images
@@ -41,10 +42,13 @@ import sys; sys.modules.clear()
 import os
 import math
 import shutil
+import csv
 
 from net.imagej.axis import Axes
 from net.imagej.ops import Ops
 from net.imglib2.img.display.imagej import ImageJFunctions
+from net.imglib2.view import Views
+from net.imglib2.img import ImgView
 
 import fiji.plugin.kymographbuilder.KymographFactory as KFactory
 
@@ -59,7 +63,7 @@ from java.awt import Polygon
 
 from ij2_tools import do_projection
 from ij2_tools import apply_dog_filter
-from ij2_tools import subtract_first_image
+from ij2_tools.subtract import subtract_consecutive_frames
 from ij2_tools.geometry import get_circle_points
 from ij2_tools.geometry import get_two_circles_points
 from ij2_tools.utils import combinations
@@ -69,9 +73,10 @@ from ij2_tools import print_info
 
 
 ## Fixed parameters
+
 n_points_circle = 30
 line_width = 4
-diameter_spot_detection_um = sigma1_um
+
 
 ## Functions
 
@@ -112,16 +117,25 @@ def add_row(table, value, key):
 		table.addValue('Value', value)
 		table.addValue('Key', str(key))
 
+def get_points_in_result(result_file):
+	points = []
+	f = open(result_file, 'rb')
+	reader = csv.reader(f)
+	for i, row in enumerate(reader):
+		if i > 0:
+			points.append([float(row[7]), float(row[8])])
+			if row[9] != 'None':
+				points.append([float(row[9]), float(row[10])])
+	f.close()
+	return points
 
 ## Main Code
 
 def main():
 
-	# Check for points ROI on the image
-	roi = imp.getRoi()
-	if not roi or not roi.getType() == Roi.POINT:
-		status.warn("Please selection one or more points with the multi points tools.")
-		return
+	fname = data.getSource()
+	dir_path = os.path.dirname(fname)
+	analysis_dir = os.path.join(dir_path, "Analysis_Nucleation")
 
 	## Convert parameters in pixel
 	message = "Parameters scaled in pixel : \n"
@@ -137,19 +151,26 @@ def main():
 	message += "Spot Diameter : %0.2f" % diameter_spot_detection
 	log(message)
 
+	# Check for points ROI on the image
+	roi = imp.getRoi()
+	if not roi or not roi.getType() == Roi.POINT:
+		centrosomes = get_points_in_result(os.path.join(analysis_dir, "Results.csv"))
+	else:
+		points = roi.getContainedPoints()
+		centrosomes = [[p.x, p.y] for p in points]
+
+	if not centrosomes:
+		status.warn("Please selection one or more points with the multi points tools.")
+		return
+
 	# Get centrosomes positions
-	points = roi.getContainedPoints()
-	centrosomes = [[p.x, p.y] for p in points]
-	log("%i centrosomes detected" % len(points))
+	log("%i centrosomes detected" % len(centrosomes))
 
 	# Get cell objects
 	cells = get_cells(centrosomes, diameter_kymograph)
 	log("%i cells detected" % len(cells))
 
 	# Init path and create the Analysis folder
-	fname = data.getSource()
-	dir_path = os.path.dirname(fname)
-	analysis_dir = os.path.join(dir_path, "Analysis_Nucleation")
 	if not os.path.exists(analysis_dir):
 		os.makedirs(analysis_dir)
 
@@ -209,14 +230,17 @@ def main():
 		# TODO
 
 		kymo_fname = os.path.join(analysis_dir, name + ".tif")
-
-		if save_images:
-			log("Saving Kymograph for Centrosome #%i to %s" % (i+1, kymo_fname))
-			kymograph.setSource(kymo_fname)
-			ij.io().save(kymograph, kymo_fname)
+		log("Saving Kymograph for Centrosome #%i to %s" % (i+1, kymo_fname))
+		kymograph.setSource(kymo_fname)
+		ij.io().save(kymograph, kymo_fname)
 
 		if show_images in ["All","Only Kymographs"]:
 			ij.ui().show(kymo_fname, kymograph)
+
+		# Remove a possible singleton dimension...
+		kymograph_view = ij.op().run("transform.dropSingletonDimensionsView", kymograph)
+		kymograph = ImgView.wrap(kymograph_view, ij.op().run("create.imgFactory", kymograph))
+		kymograph = ij.dataset().create(kymograph)
 
 		# Track spots
 		spots = dog_detector(ij, kymograph, radius=radius_spot_detection, relative_threshold=None,
@@ -254,6 +278,8 @@ def main():
 		result['duration'] = duration
 		result['nucleation_rate'] = nucleation_rate
 		results.append(result)
+
+		log("## Centrosome #%i : %f nucleations/min " % (i+1, result['nucleation_rate']))
 
 	# Clean Roi Manager
 	get_roi_manager(new=True)
