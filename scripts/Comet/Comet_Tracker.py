@@ -14,6 +14,8 @@ from net.imglib2.util import Intervals
 from net.imglib2.algorithm.labeling.ConnectedComponents import StructuringElement
 from net.imglib2.roi.labeling import LabelRegions
 from net.imglib2.view import Views
+from net.imglib2.img import ImgView
+from net.imglib2 import FinalInterval
 
 from ij2_tools import do_projection
 from ij2_tools import apply_dog_filter
@@ -44,13 +46,8 @@ z_projected = do_projection(ij, data, axis_type="Z", method="Max", save=save_ima
 if show_images:
 	ij.ui().show("z_projected", z_projected)
 
-# Subtract stack to its first image
-subtracted = subtract_first_image(ij, z_projected, save=save_images, output_dir=output_dir)
-if show_images:
-	ij.ui().show("subtracted", subtracted)
-
 ## DOG Filtering
-dog = apply_dog_filter(ij, subtracted, sigma1, sigma2, save=save_images, output_dir=output_dir)
+dog = apply_dog_filter(ij, z_projected, sigma1, sigma2, save=save_images, output_dir=output_dir)
 if show_images:
 	ij.ui().show("dog", dog)
 
@@ -100,22 +97,19 @@ for t in range(thresholded.dimension(axis)):
 		patches_list.append(patch)
 
 # Stack the patches
-axis_types = [Axes.X, Axes.Y, Axes.TIME]
-from net.imagej import ImgPlus
-
 patches = Views.stack(patches_list)
 
-intervals_start = [patch.min(d) for d in range(0, patch.numDimensions())]
-intervals_end = [patch.max(d) for d in range(0, patch.numDimensions())]
-intervals_start += [0]
-intervals_end += [len(patches_list)]
-finalIntervals = Intervals.createMinMax(*(intervals_start + intervals_end))
-patches = ij.op().run("transform.intervalView", patches, finalIntervals)
-print(patches)
+dimensions = [patch.max(d) + 1 for d in range(patch.numDimensions())]
+dimensions += [len(patches_list)+1]
 
-#patches = ij.dataset().create(patches)
-	
-print(patches)
+patches = Views.interval(patches, FinalInterval(dimensions))
+
+print(dimensions)
+#patches = ImgView.wrap(patches, ij.op().run("create.imgFactory", FinalInterval(dimensions)))
+
+print(patches.numDimensions())
+ij.ui().show("patches", patches)
+patches = ij.dataset().create(patches)
 
 ij.ui().show("patches", patches)
 
