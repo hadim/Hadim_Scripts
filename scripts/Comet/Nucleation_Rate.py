@@ -5,13 +5,13 @@
 # @Float(label="KYMOGRAPH | Circle Diameter (um)", required=true, value=4.5, stepSize=0.1) diameter_kymograph_um
 # @Float(label="DETECTION | Spot Diameter", required=true, value=0.400, stepSize=0.01) diameter_spot_detection_um
 # @Float(label="DETECTION | Threshold", required=true, value=25, stepSize=1) threshold_detection
-# @String(label="Show images ?", style="radioButtonHorizontal", choices={ "All","Only Kymographs", "None" }) show_images
+# @String(label="Show images ?", style="radioButtonHorizontal", choices={ "All","Only Kymographs", "None" }, value="None") show_images
 # @Boolean(label="Save intermediates images ?", value=True) save_images
 # @Boolean(label="Show Results Tables ?", value=True) show_results
 
 # @ImageJ ij
-# @ImagePlus imp
 # @Dataset data
+# @ImagePlus imp
 # @StatusService status
 # @LogService logger
 # @OpService ops
