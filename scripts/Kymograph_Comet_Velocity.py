@@ -83,7 +83,7 @@ def main():
 		rt.incrementCounter()
 		rt.addValue("Track ID", i+1)
 		rt.addValue("ROI ID", roi.name)
-		rt.addValue("Track Length (um)", abs(run_length))
+		rt.addValue("Track  (um)", abs(run_length))
 		rt.addValue("Track duration (s)", abs(run_duration))
 		rt.addValue("Track speed (um/s)", run_speed)
 		rt.addValue("x1", x1)
