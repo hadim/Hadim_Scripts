@@ -8,7 +8,7 @@ Use it, hack it, share it.
 
 Warning : some scripts may need the `ij2-python-tool` plugin : https://github.com/hadim/ij2-python-lib.
 
-### Scripts
+## Scripts
 
 - Crop_Multi_Roi.py : auto crop and save ROIs in an opened image.
 - Get_OME_String.py : display OME string of an OME Tiff file.
