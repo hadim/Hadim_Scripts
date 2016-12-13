@@ -14,7 +14,7 @@ Add the `Hadim` update site in `Help ▶ Update...` (see http://imagej.net/Follo
 - Crop_Multi_Roi.py : auto crop and save ROIs in an opened image.
 - Get_OME_String.py : display OME string of an OME Tiff file.
 - Kymograph_Comet_Velocity.py : get length, duration and speed of comet from kymograph
-- ... and many [mores](./src/main/resources/script_templates/hadim_scripts/)
+- ... and many [mores](src/main/resources/script_templates/Hadim_Scripts)
 
 The repo also contains a [Python library](src/main/resources/ij2_tools) for ImageJ.
 
