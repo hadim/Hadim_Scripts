@@ -22,7 +22,7 @@ install:
   - mvn package
   - mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
-deploy:
+script:
   - export USER="Hadim"
   - export UPDATE_SITE="Hadim"
   - export URL="http://sites.imagej.net/$UPDATE_SITE/"
