@@ -14,7 +14,7 @@ mkdir -p $IJ_PATH/
 cd $HOME/
 wget --no-check-certificate https://downloads.imagej.net/fiji/latest/fiji-linux32.zip
 unzip fiji-linux32.zip
-
+/home/travis/Fiji.app/ImageJ-linux32  --help
 ls
 ls $IJ_PATH/
 ls -l /home/travis/Fiji.app/ImageJ-linux32
