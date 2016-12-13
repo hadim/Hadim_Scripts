@@ -11,9 +11,7 @@ jdk:
 install:
   - export IJ_PATH="$HOME/fiji/Fiji.app"
   - mkdir -p fiji/
-  - if [ ! -f "$IJ_PATH/ImageJ-linux64" ]; then
-        wget http://downloads.imagej.net/fiji/latest/fiji-linux64.zip -O $HOME/fiji/fiji-linux64.zip && cd $HOME/fiji/ && unzip fiji-linux64.zip;
-    fi
+  - wget http://downloads.imagej.net/fiji/latest/fiji-linux64.zip -O $HOME/fiji/fiji-linux64.zip && cd $HOME/fiji/ && unzip fiji-linux64.zip
   - export PATH="$IJ_PATH:$PATH"
   - cd $TRAVIS_BUILD_DIR
   - mvn package
