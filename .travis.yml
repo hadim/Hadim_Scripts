@@ -16,7 +16,11 @@ install:
   - export PATH="$IJ_PATH:$PATH"
   - cd $TRAVIS_BUILD_DIR
   - mvn package
-  - mvn install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
+  - mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
+
+script:
+  - chmod a+x upload-site-simple.sh
+  - cd $IJ_PATH && ./.upload-site-simple.sh Hadim Hadim
 
 branches:
   only:
