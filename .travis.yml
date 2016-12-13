@@ -8,10 +8,17 @@ cache:
 jdk:
   - oraclejdk8
 
+install:
+  - export IJ_PATH="$HOME/fiji/Fiji.app"
+  - mkdir -p fiji/
+  - if [ ! -f "$IJ_PATH/ImageJ-linux64" ]; then wget http://downloads.imagej.net/fiji/latest/fiji-linux64.zip -O $HOME/fiji/fiji-linux64.zip && cd $HOME/fiji/ && unzip fiji-linux64.zip; fi
+  - export PATH="$IJ_PATH:$PATH"
+  - cd $TRAVIS_BUILD_DIR
+  - mvn package
+  - mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
+
 script:
-  - curl -O http://update.imagej.net/bootstrap.js
-  - jrunscript bootstrap.js update-force-pristine
-  - ./upload-site-simple.sh Hadim Hadim
+  - cd $IJ_PATH && $TRAVIS_BUILD_DIR/.upload-site-simple.sh Hadim Hadim
 
 branches:
   only:
