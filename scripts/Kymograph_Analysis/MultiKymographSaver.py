@@ -6,12 +6,10 @@
 
 import os
 
-from java.io import File
-
 from ij import ImagePlus
 from ij import IJ
 from ij.plugin.frame import RoiManager
-
+from ij import WindowManager
 
 def log_info(message):
 	log.info(message)
@@ -19,33 +17,38 @@ def log_info(message):
 
 kymo_extension = ".tif"
 
-parent_folder = File(dataset.getSource()).getParent()
+parent_folder = os.path.dirname(dataset.getSource())
 
 rm = RoiManager(True)
+rm.runCommand("Reset")
 
-for dataset in datasetService.getDatasets():
-	if dataset.getName().startswith("Kymograph_"):
+# Ugly IJ1 hack but no choice for now...
+for dataset_name in WindowManager.getImageTitles():
 
-		_, roi_id, roi_name = dataset.getName().split("_")
+	if dataset_name.startswith("Kymograph_"):
+
+		_, roi_id, roi_name = dataset_name.split("_")
 		roi_name = roi_name.split(".")[0]
-	
-		#IJ.selectWindow(dataset.getName().split(".")[0])
-		IJ.selectWindow(dataset.getName())
+		
+		if dataset_name.endswith(kymo_extension):
+			roi_path = os.path.join(parent_folder, dataset_name.replace(kymo_extension, ".zip"))
+		else:
+			roi_path = os.path.join(parent_folder, dataset_name + ".zip")
+
+		IJ.selectWindow(dataset_name)
 		imp = IJ.getImage()
 		roi = imp.getRoi()
 
 		if roi is None:
-			log_info("No ROI for %s" % dataset.getName())
-			
+			log_info("No ROI for %s" % dataset_name)
 			continue
 
-		rm.reset()
+		rm.runCommand("Reset")
 		rm.addRoi(roi)
-		roi_path = os.path.join(parent_folder, dataset.getName().replace(kymo_extension, ".zip"))
 		rm.runCommand("Save", roi_path)
 
 		log_info("ROI saved at %s" % roi_path)
 
-rm.reset()
+rm.runCommand("Reset")
 
 		

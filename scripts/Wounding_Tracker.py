@@ -17,9 +17,13 @@ all_roi_path = os.path.join(dir_path, "AllRoiSet.zip")
 inverted_path = os.path.join(dir_path, data.getName().replace(".tif", "_Inverted.tif"))
 masked_path = os.path.join(dir_path, data.getName().replace(".tif", "_Inverted_Masked.tif"))
 
-third_axis = Axes.TIME if data.dimension(Axes.TIME) > 1 else Axes.Z
+# Swap Z to TIME to axis if Z number of frames > TIME number of frames
+if data.dimension(Axes.TIME) < data.dimension(Axes.Z):
+	z_index = data.dimensionIndex(Axes.Z)
+	data.axis(z_index).setType(Axes.TIME)
+
 # Get the number of frames (TIME axis)
-nFrames = data.dimension(third_axis)
+nFrames = data.dimension(Axes.TIME)
 	
 ### ROIs Generation
 
@@ -76,6 +80,10 @@ else:
 	rm.runCommand("Reset")
 	rm.runCommand("Open", all_roi_path)
 	rois = rm.getRoisAsArray()
+
+# Close RoiManager
+rm.runCommand("Reset")
+rm.close()
 
 ### Image Filtering
 

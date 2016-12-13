@@ -1,3 +1,4 @@
+# @Integer(label="Zoom to apply to kymograph", value=400, required=false) zoom_level
 # @Context context
 # @Dataset dataset
 # @ImageJ ij
@@ -8,13 +9,13 @@ import os
 
 from ij import IJ
 from ij.plugin.frame import RoiManager
+
 import fiji.plugin.kymographbuilder.KymographFactory as KFactory
-from java.io import File
 
 rm = RoiManager.getInstance()
 counter = 0
 
-parent_folder = File(dataset.getSource()).getParent()
+parent_folder = os.path.dirname(dataset.getSource())
 
 for roi in rm.getRoisAsArray():
     if roi.isLine():
@@ -30,11 +31,7 @@ for roi in rm.getRoisAsArray():
 
         # Make the display prettier (IJ1 way)
         IJ.getImage().setDisplayMode(IJ.COMPOSITE)
-        IJ.run("Set... ", "zoom=600")
-        #IJ.getImage().setActiveChannel("100")
-        #IJ.run("Enhance Contrast", "saturated=0.35 equalize")
-        #IJ.getImage().setActiveChannel("010")
-        #IJ.run("Enhance Contrast", "saturated=0.35 equalize")
+        IJ.run("Set... ", "zoom=%i" % int(zoom_level))
 
         io.save(kymo, os.path.join(parent_folder, title) + ".tif")
 
