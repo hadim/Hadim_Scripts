@@ -14,7 +14,7 @@ install:
   - mkdir -p fiji/
   - if [ ! -f "$IJ_PATH/ImageJ-linux64" ]; then wget http://downloads.imagej.net/fiji/latest/fiji-linux64.zip -O $HOME/fiji/fiji-linux64.zip && cd $HOME/fiji/ && unzip fiji-linux64.zip; fi
   - export PATH="$IJ_PATH:$PATH"
-  - cd $HOME/fiji_scripts/
+  - cd $HOME/hadim/fiji_scripts/
   - mvn package
   - mvn install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
