@@ -15,6 +15,7 @@ cd $HOME/
 wget --no-check-certificate https://downloads.imagej.net/fiji/latest/fiji-linux32.zip
 unzip fiji-linux32.zip
 
+ls
 ls $IJ_PATH/
 
 # Install the package
