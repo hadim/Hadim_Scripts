@@ -17,6 +17,7 @@ install:
   - mvn package
   - mvn install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
+
 branches:
   only:
     - master
