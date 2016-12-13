@@ -2,7 +2,7 @@
 set -e
 
 # Define some variables
-export IJ_PATH="$HOME/Fiji.app/"
+export IJ_PATH="$HOME/Fiji.app"
 export USER="Hadim"
 export UPDATE_SITE="Hadim"
 export URL="http://sites.imagej.net/$UPDATE_SITE/"
@@ -17,6 +17,7 @@ unzip fiji-linux32.zip
 
 ls
 ls $IJ_PATH/
+ls -l /home/travis/Fiji.app//ImageJ-linux32
 
 # Install the package
 cd $TRAVIS_BUILD_DIR/
