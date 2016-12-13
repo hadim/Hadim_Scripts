@@ -4,17 +4,14 @@ sudo: false
 cache:
   directories:
     - $HOME/.m2/
-    - $HOME/fiji/
 
 jdk:
   - oraclejdk8
 
-install:
+script:
   - curl -O http://update.imagej.net/bootstrap.js
   - jrunscript bootstrap.js update-force-pristine
-
-script:
-  - cd $IJ_PATH && $TRAVIS_BUILD_DIR/.upload-site-simple.sh Hadim Hadim
+  - ./upload-site-simple.sh Hadim Hadim
 
 branches:
   only:
