@@ -28,7 +28,7 @@ script:
   - export URL="http://sites.imagej.net/$UPDATE_SITE/"
   - export IJ_LAUNCHER="$IJ_PATH/ImageJ-linux64"
 
-  - $IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $url "webdav:$USER:$WIKI_UPLOAD_PASS" .
+  - $IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
   - $IJ_LAUNCHER upload-complete-site --force --force-shadow $UPDATE_SITE
 
 branches:
