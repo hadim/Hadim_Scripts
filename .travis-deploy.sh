@@ -15,6 +15,8 @@ cd $IJ_PATH/
 wget http://update.imagej.net/bootstrap.js
 jrunscript bootstrap.js update-force-pristine
 
+ls
+
 # Install the package
 cd $TRAVIS_BUILD_DIR/
 mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
