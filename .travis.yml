@@ -20,7 +20,7 @@ install:
 
 script:
   - chmod a+x upload-site-simple.sh
-  - cd $IJ_PATH && ./.upload-site-simple.sh Hadim Hadim
+  - cd $IJ_PATH && $TRAVIS_BUILD_DIR/.upload-site-simple.sh Hadim Hadim
 
 branches:
   only:
