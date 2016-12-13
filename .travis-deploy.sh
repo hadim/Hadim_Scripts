@@ -2,9 +2,10 @@
 set -e
 
 # Define some variables
-export IJ_PATH="$HOME/Fiji.app"
 export USER="Hadim"
 export UPDATE_SITE="Hadim"
+
+export IJ_PATH="$HOME/Fiji.app"
 export URL="http://sites.imagej.net/$UPDATE_SITE/"
 export IJ_LAUNCHER="$IJ_PATH/ImageJ-linux64"
 export PATH="$IJ_PATH:$PATH"
