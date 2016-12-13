@@ -12,7 +12,7 @@ export PATH="$IJ_PATH:$PATH"
 # Install ImageJ
 mkdir -p $IJ_PATH/
 cd $HOME/
-wget https://downloads.imagej.net/fiji/latest/fiji-linux32.zip
+wget --no-check-certificate https://downloads.imagej.net/fiji/latest/fiji-linux32.zip
 unzip fiji-linux32.zip
 
 ls $IJ_PATH/
