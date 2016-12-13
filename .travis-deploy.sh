@@ -14,15 +14,11 @@ mkdir -p $IJ_PATH/
 cd $HOME/
 wget --no-check-certificate https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
 unzip fiji-linux64.zip
-/home/travis/Fiji.app/ImageJ-linux64  --help
-ls
-ls $IJ_PATH/
-ls -l /home/travis/Fiji.app/ImageJ-linux64
 
 # Install the package
 cd $TRAVIS_BUILD_DIR/
 mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
 # Deploy the package
-/home/travis/Fiji.app/ImageJ-linux64 --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
-/home/travis/Fiji.app/ImageJ-linux64 --update upload-complete-site --force --force-shadow $UPDATE_SITE
+$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
+$IJ_LAUNCHER --update upload-complete-site --force --force-shadow $UPDATE_SITE
