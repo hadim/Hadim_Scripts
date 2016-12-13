@@ -17,12 +17,12 @@ unzip fiji-linux32.zip
 
 ls
 ls $IJ_PATH/
-ls -l /home/travis/Fiji.app//ImageJ-linux32
+ls -l /home/travis/Fiji.app/ImageJ-linux32
 
 # Install the package
 cd $TRAVIS_BUILD_DIR/
 mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
 # Deploy the package
-$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
-$IJ_LAUNCHER --update upload-complete-site --force --force-shadow $UPDATE_SITE
+/home/travis/Fiji.app/ImageJ-linux32 --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
+/home/travis/Fiji.app/ImageJ-linux32 --update upload-complete-site --force --force-shadow $UPDATE_SITE
