@@ -1,0 +1,22 @@
+language: java
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.m2/
+    - $HOME/fiji/
+
+jdk:
+  - oraclejdk8
+
+install:
+  - export IJ_PATH="$HOME/fiji/Fiji.app"
+  - mkdir -p fiji/
+  - if [ ! -f "$IJ_PATH/ImageJ-linux64" ]; then wget http://downloads.imagej.net/fiji/latest/fiji-linux64.zip -O fiji/fiji-linux64.zip && cd fiji/ && unzip fiji-linux64.zip; fi
+  - export PATH="$IJ_PATH:$PATH"
+  - mvn package
+  - mvn install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
+
+branches:
+  only:
+    - master
