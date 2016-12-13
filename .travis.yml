@@ -5,32 +5,11 @@ cache:
   directories:
     - $HOME/.m2/
 
-jdk:
-  - oraclejdk8
-
 install:
-  - export IJ_PATH="$HOME/fiji/Fiji.app"
-
-  - mkdir -p $HOME/fiji/
-  - wget http://downloads.imagej.net/fiji/latest/fiji-linux64.zip -O $HOME/fiji/fiji-linux64.zip
-  - cd $HOME/fiji/
-  - unzip fiji-linux64.zip
-
-  - export PATH="$IJ_PATH:$PATH"
-  - cd $TRAVIS_BUILD_DIR
-
   - mvn package
-  - mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
 script:
-  - export USER="Hadim"
-  - export UPDATE_SITE="Hadim"
-  - export URL="http://sites.imagej.net/$UPDATE_SITE/"
-  - export IJ_LAUNCHER="$IJ_PATH/ImageJ-linux64"
-  - echo $TRAVIS_TAG
-
-  - $IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
-  - $IJ_LAUNCHER --update upload-complete-site --force --force-shadow $UPDATE_SITE
+  - ./.travis-deploy.sh
 
 branches:
   only:
