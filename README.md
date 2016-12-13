@@ -12,7 +12,6 @@ Warning : some scripts may need the `ij2-python-tool` plugin : https://github.co
 
 - Crop_Multi_Roi.py : auto crop and save ROIs in an opened image.
 - Get_OME_String.py : display OME string of an OME Tiff file.
-- Kymograph.py : work in progress
 - Kymograph_Comet_Velocity.py : get length, duration and speed of comet from kymograph
 - ... and many [mores](./scripts)
 
