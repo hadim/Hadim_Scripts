@@ -9,6 +9,8 @@ Use it, hack it, share it.
 
 Add the `Hadim` update site in `Help ▶ Update...` (see http://imagej.net/Following_an_update_site for details on how to proceed).
 
+Note that only the `stable` branch is built and pushed to the `Hadim` personal update site. However those branches are very often synced together.
+
 ## Scripts
 
 - Crop_Multi_Roi.py : auto crop and save ROIs in an opened image.
