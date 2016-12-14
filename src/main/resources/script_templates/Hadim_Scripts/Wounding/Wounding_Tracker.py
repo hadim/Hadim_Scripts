@@ -29,6 +29,7 @@ from fiji.plugin.trackmate.features.track import TrackSpotQualityFeatureAnalyzer
 from fiji.plugin.trackmate.features.edges import EdgeTargetAnalyzer
 from fiji.plugin.trackmate.features.edges import EdgeTimeLocationAnalyzer
 from fiji.plugin.trackmate.features.edges import EdgeVelocityAnalyzer
+from fiji.plugin.trackmate.visualization import PerTrackFeatureColorGenerator
 
 from fiji.plugin.trackmate.io import TmXmlWriter
 
@@ -129,6 +130,10 @@ if not ok:
 
 selectionModel = SelectionModel(model)
 displayer =  HyperStackDisplayer(model, selectionModel, imp)
+color = PerTrackFeatureColorGenerator(model, 'TRACK_INDEX')
+displayer.setDisplaySettings('TrackDisplaymode', 0)
+displayer.setDisplaySettings('TrackDisplayDepth', 20)
+displayer.setDisplaySettings('TrackColoring', color)
 displayer.render()
 displayer.refresh()
 

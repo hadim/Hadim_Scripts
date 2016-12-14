@@ -71,7 +71,6 @@ for id in model.getTrackModel().trackIDs(True):
 	track = model.getTrackModel().trackSpots(id)
 
 	table.addValue('Track ID', id)
-	
 	table.addValue('TRACK_DURATION', fm.getTrackFeature(id, 'TRACK_DURATION'))
 	table.addValue('TRACK_DISPLACEMENT', fm.getTrackFeature(id, 'TRACK_DISPLACEMENT'))
 	table.addValue('TRACK_MEAN_SPEED', fm.getTrackFeature(id, 'TRACK_MEAN_SPEED'))
