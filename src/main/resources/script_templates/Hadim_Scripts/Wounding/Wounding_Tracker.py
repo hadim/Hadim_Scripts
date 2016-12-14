@@ -1,10 +1,11 @@
 # @Dataset data
 # @ImagePlus imp
 # @ImageJ ij
-# @StatusService status
 
 import os
 import sys
+
+from java.io import File
 
 from ij.gui import Roi
 from ij.plugin.frame import RoiManager
@@ -20,11 +21,16 @@ from fiji.plugin.trackmate.tracking.sparselap import SimpleSparseLAPTrackerFacto
 from fiji.plugin.trackmate.tracking import LAPUtils
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer as HyperStackDisplayer
 import fiji.plugin.trackmate.features.FeatureFilter as FeatureFilter
-import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer as TrackDurationAnalyzer
-import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer as TrackIndexAnalyzer
-import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer as TrackLocationAnalyzer
-import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer as TrackSpeedStatisticsAnalyzer
-import fiji.plugin.trackmate.features.track.TrackDurationAnalyzer as TrackSpotQualityFeatureAnalyzer
+from fiji.plugin.trackmate.features.track import TrackDurationAnalyzer
+from fiji.plugin.trackmate.features.track import TrackIndexAnalyzer
+from fiji.plugin.trackmate.features.track import TrackLocationAnalyzer
+from fiji.plugin.trackmate.features.track import TrackSpeedStatisticsAnalyzer
+from fiji.plugin.trackmate.features.track import TrackSpotQualityFeatureAnalyzer
+from fiji.plugin.trackmate.features.edges import EdgeTargetAnalyzer
+from fiji.plugin.trackmate.features.edges import EdgeTimeLocationAnalyzer
+from fiji.plugin.trackmate.features.edges import EdgeVelocityAnalyzer
+
+from fiji.plugin.trackmate.io import TmXmlWriter
 
 dir_path = os.path.dirname(data.getSource())
 all_roi_path = os.path.join(dir_path, "AllRoiSet.zip")
@@ -99,10 +105,14 @@ settings.addTrackAnalyzer(TrackIndexAnalyzer())
 settings.addTrackAnalyzer(TrackLocationAnalyzer())
 settings.addTrackAnalyzer(TrackSpeedStatisticsAnalyzer())
 settings.addTrackAnalyzer(TrackSpotQualityFeatureAnalyzer())
+
+settings.addEdgeAnalyzer(EdgeTargetAnalyzer())
+settings.addEdgeAnalyzer(EdgeTimeLocationAnalyzer())
+settings.addEdgeAnalyzer(EdgeVelocityAnalyzer())
     
 filter2 = FeatureFilter('NUMBER_SPOTS', 8, True)
 settings.addTrackFilter(filter2)
-filter3 = FeatureFilter('TRACK_MEAN_SPEED', 40, True)
+filter3 = FeatureFilter('TRACK_MEAN_SPEED', 3, True)
 settings.addTrackFilter(filter3)
 filter4 = FeatureFilter('TRACK_MEAN_SPEED', 50, False)
 settings.addTrackFilter(filter4)
@@ -122,4 +132,10 @@ displayer =  HyperStackDisplayer(model, selectionModel, imp)
 displayer.render()
 displayer.refresh()
 
-print("Tracking is done")
+### Save the tracks in XML file
+writer = TmXmlWriter(File(trackmate_path))
+writer.appendModel(model)
+writer.appendSettings(settings)
+writer.writeToFile()
+
+print("Tracking is done and saved at %s" % trackmate_path)
