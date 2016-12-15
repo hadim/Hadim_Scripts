@@ -124,7 +124,7 @@ if not os.path.isfile(masked_path):
 				targetRA.setPosition([x, y, t])
 				if roi.contains(x, y):
 					targetRA.get().set(dataRA.get())
-		status.showStatus(t+1, nFrames, "Applying mask to image %i/%i" % (t, nFrames))
+		status.showStatus(t+1, nFrames, "Applying mask to image %i/%i" % (t+1, nFrames))
 		
 	ij.dataset().save(masked, masked_path)
 else:
