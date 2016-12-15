@@ -1,3 +1,10 @@
+# @Float(label="Detection Threshold", required=false, value=0.63) detection_threshold
+# @Float(label="Detection Spot Diameter", required=false, value=30.0) detection_diameter
+# @Integer(label="Minimum Number of Spots in a Track", required=false, value=8) minimum_number_spots
+# @Float(label="Minimum Mean Speed", required=false, value=3.0) minimum_mean_speed
+# @Float(label="Maximum Mean Speed", required=false, value=50.0) maximum_mean_speed
+# @Float(label="Linking Maximum Distance", required=false, value=80.0) linking_maximum_ditance
+# @Integer(label="Maximum Frame Gap", required=false, value=3) maximum_frame_gap
 # @Dataset data
 # @ImagePlus imp
 # @ImageJ ij
@@ -89,17 +96,17 @@ settings.setFrom(imp)
 settings.detectorFactory = LogDetectorFactory()
 settings.detectorSettings = { 
     'DO_SUBPIXEL_LOCALIZATION' : True,
-    'RADIUS' : 15.0,
+    'RADIUS' : detection_diameter / 2,
     'TARGET_CHANNEL' : 0,
-    'THRESHOLD' : 0.63,
+    'THRESHOLD' : float(detection_threshold),
     'DO_MEDIAN_FILTERING' : False,
 }  
      
 settings.trackerFactory = SparseLAPTrackerFactory()
 settings.trackerSettings = LAPUtils.getDefaultLAPSettingsMap()
-settings.trackerSettings['LINKING_MAX_DISTANCE'] = float(80)
-settings.trackerSettings['GAP_CLOSING_MAX_DISTANCE'] = float(80)
-settings.trackerSettings['MAX_FRAME_GAP'] = 5
+settings.trackerSettings['LINKING_MAX_DISTANCE'] = float(linking_maximum_ditance)
+settings.trackerSettings['GAP_CLOSING_MAX_DISTANCE'] = float(linking_maximum_ditance)
+settings.trackerSettings['MAX_FRAME_GAP'] = maximum_frame_gap
 
 settings.addTrackAnalyzer(TrackDurationAnalyzer())
 settings.addTrackAnalyzer(TrackIndexAnalyzer())
@@ -111,11 +118,11 @@ settings.addEdgeAnalyzer(EdgeTargetAnalyzer())
 settings.addEdgeAnalyzer(EdgeTimeLocationAnalyzer())
 settings.addEdgeAnalyzer(EdgeVelocityAnalyzer())
     
-filter2 = FeatureFilter('NUMBER_SPOTS', 8, True)
+filter2 = FeatureFilter('NUMBER_SPOTS', minimum_number_spots, True)
 settings.addTrackFilter(filter2)
-filter3 = FeatureFilter('TRACK_MEAN_SPEED', 3, True)
+filter3 = FeatureFilter('TRACK_MEAN_SPEED', minimum_mean_speed, True)
 settings.addTrackFilter(filter3)
-filter4 = FeatureFilter('TRACK_MEAN_SPEED', 50, False)
+filter4 = FeatureFilter('TRACK_MEAN_SPEED', maximum_mean_speed, False)
 settings.addTrackFilter(filter4)
     
 trackmate = TrackMate(model, settings)
