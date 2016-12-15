@@ -105,9 +105,6 @@ ij.ui().show(inverted)
 ### For each frame apply a mask according to the ROIs
 
 if not os.path.isfile(masked_path):
-	x_index = inverted.dimensionIndex(Axes.X)
-	y_index = inverted.dimensionIndex(Axes.Y)
-	
 	masked = ij.op().create().img(inverted)
 	
 	targetRA = masked.randomAccess()

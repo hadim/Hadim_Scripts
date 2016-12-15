@@ -1,16 +1,16 @@
 # @Dataset data
+# @ImagePlus imp
 # @ImageJ ij
 
-from ij import IJ
-from net.imglib2.img.display.imagej import ImageJFunctions
+roi = imp.getRoi()
+x1 = roi.getBoundingRect().x
+y1 = roi.getBoundingRect().y
+x2 = x1 + roi.getBoundingRect().width
+y2 = y1 + roi.getBoundingRect().height
 
-imp = ImageJFunctions.wrap(data, data.getName())
-
-filtered_imp = imp.clone()
-imp = IJ.run(filtered_imp, "Bandpass Filter...", "filter_large=40 filter_small=10 suppress=None tolerance=5 autoscale saturate processStack=true")
-filtered_imp.show()
-
-#IJ.save(filtered_imp, "/home/hadim/filtered.tif")
-#data_filtered = ij.dataset().open("/home/hadim/filtered.tif")
-#ij.ui().show(data_filtered)
-
+for x in range(x1, x2):
+	for y in range(y1, y2):
+		dataRA.setPosition([x, y, t])
+		targetRA.setPosition([x, y, t])
+		if roi.contains(x, y):
+			targetRA.get().set(dataRA.get())
