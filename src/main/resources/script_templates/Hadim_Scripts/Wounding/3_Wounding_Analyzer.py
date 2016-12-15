@@ -1,5 +1,6 @@
 # @Float(label="Pixel Size (um)", required=false, value=1) pixel_size
-# @Float(label="Duration between Two Frames (s)", required=false, value=1) dt
+# @Float(label="Duration between Two Frames", required=false, value=1) dt
+# @String(label="Time unit", required=false, value='s', choices={'sec', 'min', 'hours'}) time_unit
 # @Dataset data
 # @ImagePlus imp
 # @ImageJ ij
@@ -73,12 +74,12 @@ for id in model.getTrackModel().trackIDs(True):
 	track = model.getTrackModel().trackSpots(id)
 
 	table.addValue('Track ID', id)
-	table.addValue('TRACK_DURATION', fm.getTrackFeature(id, 'TRACK_DURATION') * dt)
-	table.addValue('TRACK_DISPLACEMENT', fm.getTrackFeature(id, 'TRACK_DISPLACEMENT') * pixel_size)
-	table.addValue('TRACK_MEAN_SPEED', fm.getTrackFeature(id, 'TRACK_MEAN_SPEED') * pixel_size / dt)
-	table.addValue('TRACK_MIN_SPEED', fm.getTrackFeature(id, 'TRACK_MIN_SPEED') * pixel_size / dt)
-	table.addValue('TRACK_MAX_SPEED', fm.getTrackFeature(id, 'TRACK_MAX_SPEED') * pixel_size / dt)
-	table.addValue('TRACK_STD_SPEED', fm.getTrackFeature(id, 'TRACK_STD_SPEED') * pixel_size / dt)
+	table.addValue('TRACK_DURATION (%s)' % time_unit, fm.getTrackFeature(id, 'TRACK_DURATION') * dt)
+	table.addValue('TRACK_DISPLACEMENT (um)', fm.getTrackFeature(id, 'TRACK_DISPLACEMENT') * pixel_size)
+	table.addValue('TRACK_MEAN_SPEED (um/%s)' % time_unit, fm.getTrackFeature(id, 'TRACK_MEAN_SPEED') * pixel_size / dt)
+	table.addValue('TRACK_MIN_SPEED (um/%s)' % time_unit, fm.getTrackFeature(id, 'TRACK_MIN_SPEED') * pixel_size / dt)
+	table.addValue('TRACK_MAX_SPEED (um/%s)' % time_unit, fm.getTrackFeature(id, 'TRACK_MAX_SPEED') * pixel_size / dt)
+	table.addValue('TRACK_STD_SPEED (um/%s)' % time_unit, fm.getTrackFeature(id, 'TRACK_STD_SPEED') * pixel_size / dt)
 	
 
 table.save(stats_path)
