@@ -18,7 +18,7 @@ Use it, hack it, share it.
 
 - Click on `File ▶ New ▶ Script...`
 - The Script Editor window will open.
-- Scripts are available in `Templates ▶ Haidm Scripts`.
+- Scripts are available in `Templates ▶ Hadim Scripts`.
 
 ## `ij2_tools`
 
