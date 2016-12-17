@@ -1,5 +1,5 @@
 # @File(label="Path to Nucleation_Rate.py script") scriptFile
-# @File(label="Path to the dataset", style="directory") dataPath
+# @File(label="Path containing the dataset", style="directory") dataPath
 # @Float(label="dt (sec)", required=true, value=3, stepSize=0.1) dt
 # @Float(label="Pixel Size (um)", required=true, value=0.089, stepSize=0.01) pixel_size
 # @Float(label="PREPROCESSING | DOG Sigma 1 (um)", required=false, value=0.400, stepSize=0.01) sigma1_um
@@ -13,6 +13,8 @@
 # @ScriptService scriptService
 
 import os
+
+from java.io import File
 
 params = {}
 params['dt'] = dt
@@ -31,7 +33,7 @@ for root, dirs, files in os.walk(str(dataPath)):
 	for fname in files:
 		if fname.endswith(".nd"):
 			print("Running script for %s" % os.path.join(root, fname))
-			params['show_results'] = ij.dataset().open(os.path.join(root, fname))
-			scriptModule = scriptService.run(str(scriptFile), bool(1), params).get()
+			params['data'] = ij.dataset().open(os.path.join(root, fname))
+			scriptModule = scriptService.run(File(str(scriptFile)), True, params).get()
 
-print(scriptModule)
+			print(scriptModule)
