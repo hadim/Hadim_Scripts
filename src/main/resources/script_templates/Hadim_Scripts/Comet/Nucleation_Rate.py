@@ -37,7 +37,7 @@
 # Step 6 : Write results to a ResultsTable and save as .csv on disk.
 # Step 7 : Write parameters used to a ResultsTable and save as .csv on disk.
 
-import sys; sys.modules.clear()
+import sys
 
 import os
 import math

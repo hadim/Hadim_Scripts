@@ -50,7 +50,9 @@ def dog_detector(ij, data, radius, relative_threshold=None, absolute_threshold=N
 			y = peak.getDoublePosition(1) / calibration[1]
 			z = int(peak.getDoublePosition(2) / calibration[2])
 
-			spot_roi = OvalRoi(x - radius/2, y - radius/2, radius * 2, radius * 2)
+			diameter = int(round(radius * 2))
+
+			spot_roi = OvalRoi(int(round(x - radius/2)), int(round(y - radius/2)), diameter, diameter)
 			spot_roi.setPosition(z)
 			spots.append(spot_roi)
 
