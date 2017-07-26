@@ -9,7 +9,12 @@ from ij.gui import PolygonRoi
 from net.imagej.axis import Axes
 
 import os
+import sys
 
+
+if data.getTypeLabelShort() == "RGB":
+	ij.status().warn("The stack has an RGB type. Please convert it to 8-bit or 16-bit first.")
+	sys.exit(-1)
 
 dir_path = os.path.dirname(data.getSource())
 roi_path = os.path.join(dir_path, "RoiSet.zip")
@@ -29,8 +34,10 @@ nFrames = data.dimension(Axes.TIME)
 ### ROIs Generation
 
 rm = RoiManager.getInstance()
-if not rm:
-	rm = RoiManager()
+if not rm or len(rm.getRoisAsArray()) == 0:
+    ij.status().warn("You need to select the ROIs.")
+    sys.exit(-1)
+
 rm.runCommand("Deselect")
 
 if not os.path.isfile(all_roi_path):
@@ -94,8 +101,9 @@ filtered = data
 ### Invert Image for detection
 
 if not os.path.isfile(inverted_path):
-	inverted = ij.dataset().create(filtered)
-	inverted = ij.op().run("image.invert", filtered, inverted)
+	input = data.duplicate()
+	inverted = ij.dataset().create(data)
+	inverted = ij.op().run("image.invert", input, inverted)
 	ij.dataset().save(inverted, inverted_path)
 else:
 	inverted = ij.dataset().open(inverted_path)
