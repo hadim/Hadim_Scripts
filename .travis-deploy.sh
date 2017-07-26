@@ -1,25 +1,29 @@
 #!/usr/bin/env sh
 set -e
 
-# Define some variables
-export USER="Hadim"
 export UPDATE_SITE="Hadim"
-
-export IJ_PATH="$HOME/Fiji.app"
 export URL="http://sites.imagej.net/$UPDATE_SITE/"
+
+# Paths:
+export IJ_PATH="$HOME/Fiji.app"
 export IJ_LAUNCHER="$IJ_PATH/ImageJ-linux64"
 export PATH="$IJ_PATH:$PATH"
 
-# Install ImageJ
+# Install IJ
 mkdir -p $IJ_PATH/
 cd $HOME/
 wget --no-check-certificate https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
 unzip fiji-linux64.zip
+$IJ_LAUNCHER --update update-force-pristine
 
-# Install the package
+# Install artifact
 cd $TRAVIS_BUILD_DIR/
 mvn clean install -Dimagej.app.directory=$IJ_PATH -Ddelete.other.versions=true
 
-# Deploy the package
-$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$USER:$WIKI_UPLOAD_PASS" .
-$IJ_LAUNCHER --update upload --update-site $UPDATE_SITE --force-shadow jars/hadim-scripts.jar
+# Deploy if release version
+VERSION=`mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'`
+
+echo "Uploading to $URL..."
+$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$UPDATE_SITE:$WIKI_UPLOAD_PASS" .
+$IJ_LAUNCHER --update upload-complete-site --simulate --force-shadow "$UPDATE_SITE"
+$IJ_LAUNCHER --update edit-update-site "$UPDATE_SITE" "$URL"
