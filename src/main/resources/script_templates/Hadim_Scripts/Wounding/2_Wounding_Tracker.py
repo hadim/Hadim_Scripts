@@ -37,7 +37,6 @@ from fiji.plugin.trackmate.features.edges import EdgeTargetAnalyzer
 from fiji.plugin.trackmate.features.edges import EdgeTimeLocationAnalyzer
 from fiji.plugin.trackmate.features.edges import EdgeVelocityAnalyzer
 from fiji.plugin.trackmate.visualization import PerTrackFeatureColorGenerator
-from fiji.plugin.trackmate.gui import GuiUtils
 
 from fiji.plugin.trackmate.io import TmXmlWriter
 
@@ -45,7 +44,10 @@ dir_path = os.path.dirname(data.getSource())
 all_roi_path = os.path.join(dir_path, "AllRoiSet.zip")
 trackmate_path = os.path.join(dir_path, "Trajectories.xml")
 
-GuiUtils.userCheckImpDimensions(imp)
+# Swap Z to TIME to axis if Z number of frames > TIME number of frames
+if data.dimension(Axes.TIME) < data.dimension(Axes.Z):
+	z_index = data.dimensionIndex(Axes.Z)
+	data.axis(z_index).setType(Axes.TIME)
 
 ## Find the minimal bounding box for detection and tracking
 
