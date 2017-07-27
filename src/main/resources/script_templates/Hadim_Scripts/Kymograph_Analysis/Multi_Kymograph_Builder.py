@@ -16,6 +16,9 @@ rm = RoiManager.getInstance()
 counter = 0
 
 parent_folder = os.path.dirname(dataset.getSource())
+kymo_folder = os.path.join(parent_folder, "Kymographs-" + os.path.splitext(dataset.getName())[0])
+if not os.path.isdir(kymo_folder):
+	os.makedirs(kymo_folder)
 
 for roi in rm.getRoisAsArray():
     if roi.isLine():
@@ -33,7 +36,7 @@ for roi in rm.getRoisAsArray():
         IJ.getImage().setDisplayMode(IJ.COMPOSITE)
         IJ.run("Set... ", "zoom=%i" % int(zoom_level))
 
-        io.save(kymo, os.path.join(parent_folder, title) + ".tif")
+        io.save(kymo, os.path.join(parent_folder, kymo_folder, title + ".tif"))
 
 roi_path = os.path.join(parent_folder, os.path.splitext(dataset.getName())[0] + ".zip")
 rm.runCommand("Save", roi_path)

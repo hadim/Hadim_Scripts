@@ -1,4 +1,5 @@
-# @Context context
+# @Float(label="Zoom to apply to kymograph", value=400, required=false) x_axis_calibration
+# @Dataset dataset
 # @ImageJ ij
 # @Dataset dataset
 # @DatasetService datasetService
@@ -22,6 +23,7 @@ save_roi = True
 kymo_extension = ".tif"
 
 parent_folder = File(dataset.getSource()).getParent()
+kymo_folder = os.path.join(parent_folder, "Kymographs-" + os.path.splitext(dataset.getName())[0])
 
 rm = RoiManager(True)
 
