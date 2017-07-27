@@ -5,6 +5,7 @@
 # @LogService log
 
 import os
+import sys
 
 from ij import ImagePlus
 from ij import IJ
@@ -14,6 +15,10 @@ from ij import WindowManager
 def log_info(message):
 	log.info(message)
 	print(message)
+
+if dataset.getName().startswith("Kymograph_"):
+	ij.status().warn("Please put the focus on the main window.")
+	sys.exit(-1)
 
 kymo_extension = ".tif"
 
