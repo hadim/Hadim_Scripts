@@ -20,7 +20,17 @@
 	<url>https://github.com/hadim/fiji_scripts</url>
 	<inceptionYear>2016</inceptionYear>
 
+	<organization>
+		<name>SciJava</name>
+		<url>http://www.scijava.org/</url>
+	</organization>
+
 	<dependencies>
+		<!--ImageJ -->
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej</artifactId>
+		</dependency>
 	</dependencies>
 
 	<licenses>
