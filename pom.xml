@@ -79,6 +79,9 @@
 		<package-name>fiji_scripts</package-name>
 		<license.licenseName>mit</license.licenseName>
 		<license.copyrightOwners>Hadrien Mary</license.copyrightOwners>
+
+		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
+		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 	</properties>
 
 	<mailingLists>
