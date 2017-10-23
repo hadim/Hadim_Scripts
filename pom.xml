@@ -5,43 +5,82 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>net.imagej</groupId>
-		<artifactId>pom-imagej</artifactId>
-		<version>16.6.0</version>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>17.1.1</version>
 		<relativePath />
 	</parent>
 
 	<artifactId>hadim-scripts</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>hadim-scripts</name>
 	<description>A set of plugins/macros/script for Fiji.</description>
 	<url>https://github.com/hadim/fiji_scripts</url>
+	<inceptionYear>2016</inceptionYear>
 
 	<dependencies>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<!-- Do not generate a source jar -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<configuration>
-					<skipSource>true</skipSource>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://choosealicense.com/licenses/mit/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<developers>
 		<developer>
+			<id>hadim</id>
 			<name>Hadrien Mary</name>
 			<url>http://imagej.net/User:Hadim</url>
-			<properties><id>hadim</id></properties>
+			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+			<timezone>-5</timezone>
 		</developer>
 	</developers>
+	<contributors>
+		<!-- NB: Need a least one element to override the parent. See: https://issues.apache.org/jira/browse/MNG-5220 -->
+		<contributor>
+			<name>None</name>
+		</contributor>
+	</contributors>
+
+	<properties>
+		<package-name>fiji_scripts</package-name>
+		<license.licenseName>mit</license.licenseName>
+		<license.copyrightOwners>Hadrien Mary</license.copyrightOwners>
+	</properties>
+
+	<mailingLists>
+		<mailingList>
+			<name>ImageJ Forum</name>
+			<archive>http://forum.imagej.net/</archive>
+		</mailingList>
+	</mailingLists>
+
+	<scm>
+		<connection>scm:git:git://github.com/hadim/fiji_scripts</connection>
+		<developerConnection>scm:git:git@github.com:hadim/fiji_scripts</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/hadim/fiji_scripts</url>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/hadim/fiji_scripts/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Travis</system>
+	</ciManagement>
 
 	<repositories>
 		<repository>
