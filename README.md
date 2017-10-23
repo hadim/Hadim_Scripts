@@ -1,5 +1,5 @@
 # Fiji Scripts
-[![Build Status](https://travis-ci.org/hadim/fiji_scripts.svg?branch=stable)](https://travis-ci.org/hadim/fiji_scripts)
+[![Build Status](https://travis-ci.org/hadim/fiji_scripts.svg?branch=master)](https://travis-ci.org/hadim/fiji_scripts)
 
 A set of scripts for Fiji.
 
@@ -23,10 +23,6 @@ Use it, hack it, share it.
 ## `ij2_tools`
 
 The package also contains a [Python library](src/main/resources/ij2_tools) for ImageJ.
-
-## Deployment 
-
-Package deployment is made with Travis. Only the `stable` branch is built and pushed to the `Hadim` personal update site. However those branches are very often synced together.
 
 # License
 
