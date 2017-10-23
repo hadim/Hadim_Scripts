@@ -26,11 +26,21 @@
 	</organization>
 
 	<dependencies>
+
 		<!--ImageJ -->
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
 		</dependency>
+
+		<!-- Enable IJ1 interface at runtime -->
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-legacy</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
 	</dependencies>
 
 	<licenses>
