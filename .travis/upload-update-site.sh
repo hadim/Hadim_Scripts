@@ -4,19 +4,26 @@ set -x
 if [ -n "$TRAVIS_TAG" ];
 then
 
-	echo "Travis tag detected. Start uploading the specified update site."
+	echo "== Travis tag detected. Start uploading the specified update site. =="
 
-	if [ -z "$WIKI_UPLOAD_PASS" ];
-		echo "The variable WIKI_UPLOAD_PASS is not set. You need to set it in the Travis configuration."
+	if [ -z "$UPDATE_SITE_NAME" ];
+		echo "The variable UPDATE_SITE_NAME is not set. You need to set it in the Travis configuration."
 		exit -1
 	fi
 
-	# Configuration
-	UPDATE_SITE="Hadim"
-	UPLOAD_WITH_DEPENDENCIES=false
-	
-	# Variables
-	URL="http://sites.imagej.net/$UPDATE_SITE/"
+	if [ -z "$UPDATE_SITE_PASSWORD" ];
+		echo "The variable UPDATE_SITE_PASSWORD is not set. You need to set it in the Travis configuration."
+		exit -1
+	fi
+
+	if [ -z "$UPLOAD_WITH_DEPENDENCIES" ];
+		echo "The variable UPLOAD_WITH_DEPENDENCIES is not set. You need to set it in the Travis configuration."
+		echo "It can be either 'true' or 'false'"
+		exit -1
+	fi
+
+	echo "Setup variables."
+	URL="http://sites.imagej.net/$UPDATE_SITE_NAME/"
 	IJ_PATH="$HOME/Fiji.app"
 	IJ_LAUNCHER="$IJ_PATH/ImageJ-linux64"
 
@@ -38,13 +45,13 @@ then
 	NAME=`mvn help:evaluate -Dexpression=project.name | grep -e '^[^\[]'`
 
 	echo "Adding $URL as an Update Site."
-	$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$UPDATE_SITE:$WIKI_UPLOAD_PASS" .
+	$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE_NAME $URL "webdav:$UPDATE_SITE_NAME:$UPDATE_SITE_PASSWORD" .
 
 	if [ "$UPLOAD_WITH_DEPENDENCIES" = false ] ; then
 	    echo "Upload only \"jars/$NAME.jar\"."
-	    $IJ_LAUNCHER --update upload --update-site "$UPDATE_SITE" --force-shadow "jars/$NAME.jar"
+	    $IJ_LAUNCHER --update upload --update-site "$UPDATE_SITE_NAME" --force-shadow "jars/$NAME.jar"
 	else
 		echo "Upload $NAME with its dependencies."
-		$IJ_LAUNCHER --update upload-complete-site --force-shadow "$UPDATE_SITE"
+		$IJ_LAUNCHER --update upload-complete-site --force-shadow "$UPDATE_SITE_NAME"
 	fi
 fi
