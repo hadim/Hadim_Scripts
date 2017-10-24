@@ -17,7 +17,7 @@ then
 	# Install IJ
 	mkdir -p $IJ_PATH/
 	cd $HOME/
-	wget --no-check-certificate https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
+	wget --no-check-certificate "https://downloads.imagej.net/fiji/latest/fiji-linux64.zip"
 	unzip fiji-linux64.zip
 	$IJ_LAUNCHER --update update-force-pristine
 
@@ -35,6 +35,6 @@ then
 	#$IJ_LAUNCHER --update upload-complete-site --force-shadow "$UPDATE_SITE"
 
 	# Or only specific JAR files
-	$IJ_LAUNCHER --update upload --force-shadow "$UPDATE_SITE" hadim-scripts.jar
+	$IJ_LAUNCHER --update upload "$UPDATE_SITE" --force-shadow hadim-scripts.jar
 
 fi
