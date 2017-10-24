@@ -30,7 +30,11 @@ then
 
 	echo "Uploading to $URL..."
 	$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE $URL "webdav:$UPDATE_SITE:$WIKI_UPLOAD_PASS" .
+
+	# Choose to upload everything
 	#$IJ_LAUNCHER --update upload-complete-site --force-shadow "$UPDATE_SITE"
+
+	# Or only specific JAR files
 	$IJ_LAUNCHER --update upload --force-shadow "$UPDATE_SITE" hadim-scripts.jar
 
 fi
