@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 
 if [ -z "$UPDATE_SITE_NAME" ]; then
 	# Silently exit if UPDATE_SITE_NAME is not set.
