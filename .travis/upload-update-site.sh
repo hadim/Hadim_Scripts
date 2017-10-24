@@ -3,7 +3,7 @@ set -x
 
 if [ -n "$TRAVIS_TAG" ]; then
 
-	echo "== Travis tag detected. Start uploading the specified update site. =="
+	echo "== Travis tag detected. Start uploading the specified update site =="
 
 	if [ -z "$UPDATE_SITE_NAME" ]; then
 		echo "The variable UPDATE_SITE_NAME is not set. You need to set it in the Travis configuration."
@@ -53,4 +53,6 @@ if [ -n "$TRAVIS_TAG" ]; then
 		echo "Upload $NAME with its dependencies."
 		$IJ_LAUNCHER --update upload-complete-site --force-shadow "$UPDATE_SITE_NAME"
 	fi
+else
+	echo "== Travis tag not detected. Don't perform upload to update site =="
 fi
