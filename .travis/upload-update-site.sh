@@ -1,22 +1,21 @@
 #!/bin/sh
 set -x
 
-if [ -n "$TRAVIS_TAG" ];
-then
+if [ -n "$TRAVIS_TAG" ]; then
 
 	echo "== Travis tag detected. Start uploading the specified update site. =="
 
-	if [ -z "$UPDATE_SITE_NAME" ];
+	if [ -z "$UPDATE_SITE_NAME" ]; then
 		echo "The variable UPDATE_SITE_NAME is not set. You need to set it in the Travis configuration."
 		exit -1
 	fi
 
-	if [ -z "$UPDATE_SITE_PASSWORD" ];
+	if [ -z "$UPDATE_SITE_PASSWORD" ]; then
 		echo "The variable UPDATE_SITE_PASSWORD is not set. You need to set it in the Travis configuration."
 		exit -1
 	fi
 
-	if [ -z "$UPLOAD_WITH_DEPENDENCIES" ];
+	if [ -z "$UPLOAD_WITH_DEPENDENCIES" ]; then
 		echo "The variable UPLOAD_WITH_DEPENDENCIES is not set. You need to set it in the Travis configuration."
 		echo "It can be either 'true' or 'false'"
 		exit -1
@@ -47,7 +46,7 @@ then
 	echo "Adding $URL as an Update Site."
 	$IJ_LAUNCHER --update edit-update-site $UPDATE_SITE_NAME $URL "webdav:$UPDATE_SITE_NAME:$UPDATE_SITE_PASSWORD" .
 
-	if [ "$UPLOAD_WITH_DEPENDENCIES" = false ] ; then
+	if [ "$UPLOAD_WITH_DEPENDENCIES" = false ]; then
 	    echo "Upload only \"jars/$NAME.jar\"."
 	    $IJ_LAUNCHER --update upload --update-site "$UPDATE_SITE_NAME" --force-shadow "jars/$NAME.jar"
 	else
