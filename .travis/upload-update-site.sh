@@ -1,14 +1,14 @@
 #!/bin/sh
 set -x
 
+if [ -z "$UPDATE_SITE_NAME" ]; then
+	# Silent exit if UPDATE_SITE_NAME is not set.
+	exit 0
+fi
+
 if [ -n "$TRAVIS_TAG" ]; then
 
 	echo "== Travis tag detected. Start uploading the specified update site =="
-
-	if [ -z "$UPDATE_SITE_NAME" ]; then
-		echo "The variable UPDATE_SITE_NAME is not set. You need to set it in the Travis configuration."
-		exit -1
-	fi
 
 	if [ -z "$UPDATE_SITE_PASSWORD" ]; then
 		echo "The variable UPDATE_SITE_PASSWORD is not set. You need to set it in the Travis configuration."
@@ -29,8 +29,8 @@ if [ -n "$TRAVIS_TAG" ]; then
 	echo "Installing Fiji."
 	mkdir -p $IJ_PATH/
 	cd $HOME/
-	wget --no-check-certificate "https://downloads.imagej.net/fiji/latest/fiji-linux64.zip"
-	unzip fiji-linux64.zip
+	wget -q --no-check-certificate "https://downloads.imagej.net/fiji/latest/fiji-linux64.zip"
+	unzip -q fiji-linux64.zip
 
 	echo "Updating Fiji."
 	$IJ_LAUNCHER --update update-force-pristine
