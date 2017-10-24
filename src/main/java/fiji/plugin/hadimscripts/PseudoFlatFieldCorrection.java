@@ -38,6 +38,9 @@ public class PseudoFlatFieldCorrection implements Command {
 	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)")
 	private Integer gaussianFilterSize = 50;
 
+	@Parameter(type = ItemIO.INPUT, label = "Normalize Intensity")
+	private Boolean normalizeIntensity = true;
+
 	@Parameter(type = ItemIO.OUTPUT)
 	private Dataset output;
 
@@ -72,11 +75,19 @@ public class PseudoFlatFieldCorrection implements Command {
 				out2.firstElement());
 		ops.convert().imageType(out3, out2, op2);
 
+		Img<T> out4 = out3;
+		if (normalizeIntensity) {
+			out4 = (Img<T>) ops.create().img(out3);
+			RealTypeConverter scaleOp = (RealTypeConverter) ops.op("convert.normalizeScale", out4.firstElement(),
+					out3.firstElement());
+			ops.convert().imageType(out4, out3, scaleOp);
+		}
+
 		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
 		for (int i = 0; i != axes.length; i++) {
 			axes[i] = dataset.axis(i);
 		}
-		Dataset output = ds.create(out3);
+		Dataset output = ds.create(out4);
 		output.setAxes(axes);
 		return output;
 	}

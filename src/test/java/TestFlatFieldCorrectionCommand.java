@@ -24,6 +24,7 @@ public class TestFlatFieldCorrectionCommand {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("input", dataset);
 		parameters.put("gaussianFilterSize", 50);
+		parameters.put("normalizeIntensity", false);
 
 		CommandModule module = ij.command().run(PseudoFlatFieldCorrection.class, true, parameters).get();
 		Dataset output = (Dataset) module.getOutput("output");
