@@ -35,6 +35,6 @@ then
 	#$IJ_LAUNCHER --update upload-complete-site --force-shadow "$UPDATE_SITE"
 
 	# Or only specific JAR files
-	$IJ_LAUNCHER --update upload "$UPDATE_SITE" --force-shadow hadim-scripts.jar
+	$IJ_LAUNCHER --update upload --site "$UPDATE_SITE" --force-shadow hadim-scripts.jar
 
 fi
