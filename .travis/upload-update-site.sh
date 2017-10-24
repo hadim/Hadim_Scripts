@@ -2,7 +2,7 @@
 set -x
 
 if [ -z "$UPDATE_SITE_NAME" ]; then
-	# Silent exit if UPDATE_SITE_NAME is not set.
+	# Silently exit if UPDATE_SITE_NAME is not set.
 	exit 0
 fi
 
@@ -17,7 +17,7 @@ if [ -n "$TRAVIS_TAG" ]; then
 
 	if [ -z "$UPLOAD_WITH_DEPENDENCIES" ]; then
 		echo "The variable UPLOAD_WITH_DEPENDENCIES is not set. You need to set it in the Travis configuration."
-		echo "It can be either 'true' or 'false'"
+		echo "It can be either 'true' or 'false'."
 		exit -1
 	fi
 
