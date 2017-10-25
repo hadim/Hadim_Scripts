@@ -9,8 +9,3 @@ script: ".travis/build.sh"
 cache:
   directories:
   - "~/.m2/repository"
-env:
-  global:
-  - secure: L483VqgKZMAn9D2cmaE1fAZKC2Nc3LjOyteE4jDhE1L+H4RrxTv/vChCLVYof265a1YJCncluUYXyrrwjm5pOiaAGEeAGk7YMd/uEeL6LdES87clNsWFXQZ/fTo/CMnwjaOShbOyBiX3rLeNe52ze4ooOq5hQ8DD0tbA6fT0OLc=
-  - secure: R0NnJI7L9OzOfd4bzwlo6W8M0PO/hK9JK7MTkOSXc8PXFHY10ao9Ct0qMa8ebhjViXBv2rg0m/CzvLx3CzmkYe9ytPDWYU/5JHg19BuEDPwMP9pVMh4XjS8ryoK7Cgc5iulDTAEPQs0nag9gugcl1VF3KiT7+pso8P2YtiyGRDQ=
-  - secure: ZnLN6ixYIl5yvQ6QB55TFLGzA4nKVoIfQ2toxa5G1IXBzZzQFSQnhvdMLdkzRdfAgqhH7jATtkfPdD96ndH2ltuWS5LwHj2z8fREP5+qfe4+s0n55BCZX29DHanwFDY1Ew0SGZa7OFVGAmYtBHRAv7IeOjR7xT12K424l65ggfA=
