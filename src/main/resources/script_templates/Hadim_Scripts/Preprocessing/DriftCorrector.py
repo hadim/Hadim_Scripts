@@ -1,6 +1,7 @@
 # @ImageJ ij
 # @Dataset ds
 # @OpService ops
+# @UIService ui
 # @DatasetService datasetService
 # @OUTPUT Dataset final_dataset
 
@@ -11,6 +12,10 @@ from net.imagej.axis import Axes
 from net.imglib2.view import Views
 
 from ij.plugin.frame import RoiManager
+
+ij.ui().showDialog("This script only works with single channel images. " + 
+	"If your script has multiple channels, please use `Image > Color > Split Channels` " + 
+	"and apply the script on each individual channel.");
 
 # Initialize some variables
 img = ds.getImgPlus()
@@ -27,11 +32,16 @@ for j, r in enumerate(range(len(rois)-1)):
 	# Get two ROIs
 	start = rois[r]
 	end = rois[r+1]
-
+	
 	# Get Z or T positions defined by the position of the ROIs
-	z_start = start.getPosition()
-	z_end = end.getPosition()
+	if start.getTPosition() == 0:
+		z_start = start.getZPosition()
+		z_end = end.getZPosition()
+	else:
+		z_start = start.getTPosition()
+		z_end = end.getTPosition()
 
+ 
 	# Get X positions
 	x_start = start.getContainedPoints()[0].x
 	x_end = end.getContainedPoints()[0].x
