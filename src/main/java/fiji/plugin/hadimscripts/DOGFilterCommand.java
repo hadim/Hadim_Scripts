@@ -7,10 +7,8 @@ import org.scijava.plugin.Plugin;
 
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
-import net.imagej.axis.CalibratedAxis;
 import net.imagej.ops.convert.RealTypeConverter;
 import net.imagej.ops.special.computer.UnaryComputerOp;
-import net.imglib2.IterableInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
@@ -46,6 +44,13 @@ public class DOGFilterCommand extends AbstractPreprocessingCommand {
 	}
 
 	public <T extends RealType<T>> Dataset applyDOGFilter(Dataset input, int sigma1, int sigma2) {
+
+		if (sigma1 < sigma2) {
+			int tmp = sigma1;
+			sigma1 = sigma2;
+			sigma2 = tmp;
+		}
+
 		Dataset dataset = input.duplicate();
 
 		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(Axes.Y) };
