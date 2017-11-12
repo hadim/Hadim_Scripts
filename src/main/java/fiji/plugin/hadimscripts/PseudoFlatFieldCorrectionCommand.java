@@ -42,7 +42,9 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 	@Override
 	public void run() {
 		this.output = doPseudoFlatFieldCorrection(this.input, this.gaussianFilterSize);
-		this.saveImage(this.input, this.output, this.suffix);
+		if (this.saveImage) {
+			this.saveImage(this.input, this.output, this.suffix);
+		}
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {

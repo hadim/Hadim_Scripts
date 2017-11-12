@@ -40,7 +40,9 @@ public class DOGFilterCommand extends AbstractPreprocessingCommand {
 	@Override
 	public void run() {
 		this.output = applyDOGFilter(this.input, this.sigma1, this.sigma2);
-		this.saveImage(this.input, this.output, this.suffix);
+		if (this.saveImage) {
+			this.saveImage(this.input, this.output, this.suffix);
+		}
 	}
 
 	public <T extends RealType<T>> Dataset applyDOGFilter(Dataset input, int sigma1, int sigma2) {
