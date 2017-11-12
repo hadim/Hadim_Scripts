@@ -16,7 +16,7 @@ You need to add the `Hadim` update site:
 
 ## The scripts
 
-to open the scripts do the following:
+To open and run the scripts do the following:
 
 - Click on `File ▶ New ▶ Script...`
 - The Script Editor window will open.
