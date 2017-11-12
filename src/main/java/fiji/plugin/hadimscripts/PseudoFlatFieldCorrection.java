@@ -20,7 +20,7 @@ import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
 
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>Preprocessing>Pseudo FlatField Correction")
+@Plugin(type = ContextCommand.class, menuPath = "Plugins>Hadim>Pseudo Flat-Field Correction")
 public class PseudoFlatFieldCorrection implements Command {
 
 	@Parameter
@@ -35,7 +35,11 @@ public class PseudoFlatFieldCorrection implements Command {
 	@Parameter(type = ItemIO.INPUT, description = "Source Image")
 	private Dataset input;
 
-	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)")
+	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)",
+			description="The size of the Gaussian filter used to estimate the background. Higher is this value, "
+					+ "bigger will be the features used to estimate the background. For example, to filter "
+					+ "an uneven background in fluorescent images, you can use try a size corresponding to 10% of "
+					+ "the size of your image.")
 	private Integer gaussianFilterSize = 50;
 
 	@Parameter(type = ItemIO.INPUT, label = "Normalize Intensity")
