@@ -1,17 +1,13 @@
 package fiji.plugin.hadimscripts;
 
 import org.scijava.ItemIO;
-import org.scijava.app.StatusService;
-import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
-import net.imagej.ops.OpService;
 import net.imagej.ops.convert.RealTypeConverter;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.IterableInterval;
@@ -21,29 +17,25 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
 
 @Plugin(type = ContextCommand.class, menuPath = "Plugins>Hadim>Pseudo Flat-Field Correction")
-public class PseudoFlatFieldCorrectionCommand implements Command {
-
-	@Parameter
-	private OpService ops;
-
-	@Parameter
-	private DatasetService ds;
-
-	@Parameter
-	private StatusService status;
+public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingCommand {
 
 	@Parameter(type = ItemIO.INPUT, description = "Source Image")
 	private Dataset input;
 
-	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)",
-			description="The size of the Gaussian filter used to estimate the background. Higher is this value, "
-					+ "bigger will be the features used to estimate the background. For example, to filter "
-					+ "an uneven background in fluorescent images, you can use try a size corresponding to 10% of "
-					+ "the size of your image.")
+	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)", description = "The size of the Gaussian filter used to estimate the background. Higher is this value, "
+			+ "bigger will be the features used to estimate the background. For example, to filter "
+			+ "an uneven background in fluorescent images, you can use try a size corresponding to 10% of "
+			+ "the size of your image.")
 	private Integer gaussianFilterSize = 50;
 
 	@Parameter(type = ItemIO.INPUT, label = "Normalize Intensity")
 	private Boolean normalizeIntensity = true;
+
+	@Parameter(type = ItemIO.INPUT, label = "Save result image (if possible)")
+	private Boolean saveImage = false;
+
+	@Parameter(type = ItemIO.INPUT, label = "Suffix to use for saving")
+	private String suffix = "-Preprocessed";
 
 	@Parameter(type = ItemIO.OUTPUT)
 	private Dataset output;
@@ -51,6 +43,7 @@ public class PseudoFlatFieldCorrectionCommand implements Command {
 	@Override
 	public void run() {
 		this.output = doPseudoFlatFieldCorrection(this.input, this.gaussianFilterSize);
+		this.saveImage(this.input, this.output, this.suffix);
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {
