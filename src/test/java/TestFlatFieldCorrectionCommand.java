@@ -4,7 +4,7 @@ import java.util.Map;
 import org.scijava.Context;
 import org.scijava.command.CommandModule;
 
-import fiji.plugin.hadimscripts.PseudoFlatFieldCorrection;
+import fiji.plugin.hadimscripts.PseudoFlatFieldCorrectionCommand;
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import net.imglib2.type.numeric.RealType;
@@ -26,7 +26,7 @@ public class TestFlatFieldCorrectionCommand {
 		parameters.put("gaussianFilterSize", 50);
 		parameters.put("normalizeIntensity", false);
 
-		CommandModule module = ij.command().run(PseudoFlatFieldCorrection.class, true, parameters).get();
+		CommandModule module = ij.command().run(PseudoFlatFieldCorrectionCommand.class, true, parameters).get();
 		Dataset output = (Dataset) module.getOutput("output");
 	}
 

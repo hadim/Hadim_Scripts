@@ -21,7 +21,7 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
 
 @Plugin(type = ContextCommand.class, menuPath = "Plugins>Hadim>Pseudo Flat-Field Correction")
-public class PseudoFlatFieldCorrection implements Command {
+public class PseudoFlatFieldCorrectionCommand implements Command {
 
 	@Parameter
 	private OpService ops;
