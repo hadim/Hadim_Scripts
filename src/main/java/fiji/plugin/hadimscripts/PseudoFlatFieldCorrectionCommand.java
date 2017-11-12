@@ -7,7 +7,6 @@ import org.scijava.plugin.Plugin;
 
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
-import net.imagej.axis.CalibratedAxis;
 import net.imagej.ops.convert.RealTypeConverter;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.IterableInterval;
@@ -80,13 +79,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 			ops.convert().imageType(out4, out3, scaleOp);
 		}
 
-		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
-		for (int i = 0; i != axes.length; i++) {
-			axes[i] = dataset.axis(i);
-		}
-		Dataset output = ds.create(out4);
-		output.setAxes(axes);
-		return output;
+		return matchRAIToDataset(out4, dataset);
 	}
 
 	public <T extends RealType<T>> Dataset applyGaussianFilter(Dataset input, double gaussianFilterSize) {
@@ -100,13 +93,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.gauss", dataset.getImgPlus(), sigmas);
 		ops.slice(out, (RandomAccessibleInterval<T>) dataset.getImgPlus(), op, fixedAxisIndices);
 
-		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
-		for (int i = 0; i != axes.length; i++) {
-			axes[i] = dataset.axis(i);
-		}
-		Dataset output = ds.create(out);
-		output.setAxes(axes);
-		return output;
+		return matchRAIToDataset(out, dataset);
 	}
 
 }

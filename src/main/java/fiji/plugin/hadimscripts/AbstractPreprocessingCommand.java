@@ -11,7 +11,11 @@ import org.scijava.plugin.Parameter;
 import io.scif.services.DatasetIOService;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.axis.CalibratedAxis;
 import net.imagej.ops.OpService;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.Img;
+import net.imglib2.type.numeric.RealType;
 
 public abstract class AbstractPreprocessingCommand implements Command {
 
@@ -48,7 +52,26 @@ public abstract class AbstractPreprocessingCommand implements Command {
 			status.showStatus(
 					"Output image cannot be saved on disk because the input " + "image is not saved on disk.");
 		}
+	}
 
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(RandomAccessibleInterval<T> rai, Dataset dataset) {
+		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
+		for (int i = 0; i != axes.length; i++) {
+			axes[i] = dataset.axis(i);
+		}
+		Dataset output = ds.create(rai);
+		output.setAxes(axes);
+		return output;
+	}
+
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(Img<T> rai, Dataset dataset) {
+		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
+		for (int i = 0; i != axes.length; i++) {
+			axes[i] = dataset.axis(i);
+		}
+		Dataset output = ds.create(rai);
+		output.setAxes(axes);
+		return output;
 	}
 
 }
