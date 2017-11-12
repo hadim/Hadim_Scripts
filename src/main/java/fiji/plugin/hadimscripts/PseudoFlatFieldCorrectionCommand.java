@@ -73,7 +73,7 @@ public class PseudoFlatFieldCorrectionCommand implements Command {
 		IterableInterval<FloatType> out2 = (IterableInterval<FloatType>) ops.create().img(out);
 		ops.math().subtract(out2, original, backgroundFloat);
 
-		// Clip intensities
+		// Clip intensities to input image type
 		Img<T> out3 = (Img<T>) ops.create().img(dataset.getImgPlus());
 		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus().firstElement(),
 				out2.firstElement());
