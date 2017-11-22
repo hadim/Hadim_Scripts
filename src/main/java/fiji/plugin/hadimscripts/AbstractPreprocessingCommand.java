@@ -37,7 +37,7 @@ public abstract class AbstractPreprocessingCommand implements Command {
 	protected void saveImage(Dataset input, Dataset output, String suffix) {
 
 		// Check if input is saved on disk
-		if (input.getSource() != null) {
+		if (input != null && input.getSource() != null) {
 			// Create new filename
 			String extension = FilenameUtils.getExtension(input.getSource());
 			String newFilename = FilenameUtils.removeExtension(input.getSource()) + suffix + "." + extension;
