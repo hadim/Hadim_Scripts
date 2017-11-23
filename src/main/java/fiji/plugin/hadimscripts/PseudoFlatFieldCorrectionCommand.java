@@ -37,7 +37,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 	@Parameter(type = ItemIO.INPUT, label = "Normalize Intensity", required = false)
 	private Boolean normalizeIntensity = true;
 
-	//@Parameter(type = ItemIO.INPUT, label = "Iterate over XY planes (reduce memory usage)", required = false)
+	@Parameter(type = ItemIO.INPUT, label = "Iterate over XY planes (reduce memory usage)", required = false)
 	private Boolean iteratePlane = false;
 
 	@Parameter(type = ItemIO.INPUT, label = "Save result image (if possible)", required = false)
@@ -114,6 +114,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 		}
 
 		RandomAccessibleInterval im = ops.transform().stack(stack);
+		
 		Dataset output = ds.create(im);
 		output.dimensions(new long[] { 237, 117, 2, 21 });
 
@@ -130,7 +131,8 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 		log.info(dataset.dimension(2));
 		log.info(dataset.dimension(3));
 
-		return this.matchRAIToDataset(output, dataset);
+		//return this.matchRAIToDataset(output, dataset);
+		return output;
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {
