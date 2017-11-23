@@ -100,19 +100,19 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		max[dataset.dimensionIndex(Axes.X)] = dataset.max(dataset.dimensionIndex(Axes.X));
 		max[dataset.dimensionIndex(Axes.Y)] = dataset.max(dataset.dimensionIndex(Axes.Y));
 
-		int index1 = dataset.dimensionIndex(Axes.TIME);
+		int index1 = dataset.dimensionIndex(Axes.CHANNEL);
 		int index2 = -1;
-		if (index1 == 1) {
-			index1 = dataset.dimensionIndex(Axes.CHANNEL);
+		if (index1 == -1) {
+			index1 = dataset.dimensionIndex(Axes.TIME);
 		} else {
-			index2 = dataset.dimensionIndex(Axes.CHANNEL);
+			index2 = dataset.dimensionIndex(Axes.TIME);
 		}
 
 		for (int i = 0; i < dataset.dimension(index1); i++) {
 			min[index1] = i;
 			max[index1] = i;
 			if (index2 != -1) {
-				for (int j = 0; j < index2; j++) {
+				for (int j = 0; j < dataset.dimension(index2); j++) {
 					min[index2] = j;
 					max[index2] = j;
 					interval = new FinalInterval(min, max);

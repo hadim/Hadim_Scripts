@@ -13,11 +13,14 @@ import net.imagej.Dataset;
 import net.imagej.axis.Axes;
 import net.imagej.ops.convert.RealTypeConverter;
 import net.imglib2.FinalInterval;
+import net.imglib2.Interval;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Intervals;
+import net.imglib2.view.Views;
 
 @Plugin(type = ContextCommand.class, menuPath = "Plugins>Hadim>Pseudo Flat-Field Correction")
 public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingCommand {
@@ -114,25 +117,27 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 		}
 
 		RandomAccessibleInterval im = ops.transform().stack(stack);
-		
-		Dataset output = ds.create(im);
-		output.dimensions(new long[] { 237, 117, 2, 21 });
 
-		log.info(stack.size());
-		log.info("*****");
-		log.info(im.numDimensions());
-		log.info(im.dimension(0));
-		log.info(im.dimension(1));
-		log.info(im.dimension(2));
-		log.info("*****");
-		log.info(dataset.numDimensions());
-		log.info(dataset.dimension(0));
-		log.info(dataset.dimension(1));
-		log.info(dataset.dimension(2));
-		log.info(dataset.dimension(3));
+		if (dataset.numDimensions() != im.numDimensions()) {
 
-		//return this.matchRAIToDataset(output, dataset);
-		return output;
+			long middleDimension = im.dimension(2) / dataset.dimension(Axes.CHANNEL);
+			Interval interval1 = Intervals.createMinMax(0, 0, 0, im.dimension(0) - 1, im.dimension(1) - 1,
+					middleDimension - 1);
+			Interval interval2 = Intervals.createMinMax(0, 0, middleDimension, im.dimension(0) - 1, im.dimension(1) - 1,
+					im.dimension(2) - 1);
+
+			RandomAccessibleInterval offsetInterval1 = Views.offsetInterval(im, interval1);
+			RandomAccessibleInterval offsetInterval2 = Views.offsetInterval(im, interval2);
+
+			im = Views.stack(offsetInterval1, offsetInterval2);
+
+			if (dataset.dimension(dataset.dimensionIndex(Axes.CHANNEL)) != im
+					.dimension(dataset.dimensionIndex(Axes.CHANNEL))) {
+				im = Views.permute(im, 2, 3);
+			}
+		}
+
+		return this.matchRAIToDataset(im, dataset);
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {
