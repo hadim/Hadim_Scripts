@@ -37,8 +37,8 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 	@Parameter(type = ItemIO.INPUT, label = "Normalize Intensity", required = false)
 	private Boolean normalizeIntensity = true;
 
-	@Parameter(type = ItemIO.INPUT, label = "Iterate over XY planes (reduce memory usage)", required = false)
-	private Boolean iteratePlane = true;
+	//@Parameter(type = ItemIO.INPUT, label = "Iterate over XY planes (reduce memory usage)", required = false)
+	private Boolean iteratePlane = false;
 
 	@Parameter(type = ItemIO.INPUT, label = "Save result image (if possible)", required = false)
 	private Boolean saveImage = false;
@@ -130,8 +130,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 		log.info(dataset.dimension(2));
 		log.info(dataset.dimension(3));
 
-		// return this.matchRAIToDataset(im, dataset);
-		return output;
+		return this.matchRAIToDataset(output, dataset);
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {

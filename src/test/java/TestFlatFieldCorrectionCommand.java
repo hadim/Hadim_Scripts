@@ -25,7 +25,7 @@ public class TestFlatFieldCorrectionCommand {
 		parameters.put("input", dataset);
 		parameters.put("gaussianFilterSize", 50);
 		parameters.put("normalizeIntensity", false);
-		parameters.put("iteratePlane", true);
+		//parameters.put("iteratePlane", true);
 		parameters.put("saveImage", false);
 		parameters.put("suffix", "");
 
