@@ -112,7 +112,7 @@ public abstract class AbstractPreprocessingCommand implements Command {
 			min[index1] = i;
 			max[index1] = i;
 			if (index2 != -1) {
-				for (int j = 0; j < dataset.dimension(Axes.CHANNEL); j++) {
+				for (int j = 0; j < index2; j++) {
 					min[index2] = j;
 					max[index2] = j;
 					interval = new FinalInterval(min, max);
