@@ -25,6 +25,9 @@ public class TestFlatFieldCorrectionCommand {
 		parameters.put("input", dataset);
 		parameters.put("gaussianFilterSize", 50);
 		parameters.put("normalizeIntensity", false);
+		parameters.put("iteratePlane", true);
+		parameters.put("saveImage", false);
+		parameters.put("suffix", "");
 
 		CommandModule module = ij.command().run(PseudoFlatFieldCorrectionCommand.class, true, parameters).get();
 		Dataset output = (Dataset) module.getOutput("output");

@@ -1,6 +1,8 @@
 package fiji.plugin.hadimscripts;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scijava.app.StatusService;
@@ -11,8 +13,11 @@ import org.scijava.plugin.Parameter;
 import io.scif.services.DatasetIOService;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.axis.Axes;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.ops.OpService;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
@@ -56,7 +61,7 @@ public abstract class AbstractPreprocessingCommand implements Command {
 
 	protected <T extends RealType<T>> Dataset matchRAIToDataset(RandomAccessibleInterval<T> rai, Dataset dataset) {
 		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
-		for (int i = 0; i != axes.length; i++) {
+		for (int i = 0; i < axes.length; i++) {
 			axes[i] = dataset.axis(i);
 		}
 		Dataset output = ds.create(rai);
@@ -66,12 +71,74 @@ public abstract class AbstractPreprocessingCommand implements Command {
 
 	protected <T extends RealType<T>> Dataset matchRAIToDataset(Img<T> rai, Dataset dataset) {
 		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
-		for (int i = 0; i != axes.length; i++) {
+		for (int i = 0; i < axes.length; i++) {
 			axes[i] = dataset.axis(i);
 		}
 		Dataset output = ds.create(rai);
 		output.setAxes(axes);
 		return output;
+	}
+
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(Dataset original, Dataset dataset) {
+		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
+		for (int i = 0; i < axes.length; i++) {
+			axes[i] = dataset.axis(i);
+		}
+		original.setAxes(axes);
+		return original;
+	}
+
+	protected List<FinalInterval> iterateOverXYPlane(Dataset dataset) {
+		List<FinalInterval> intervals = new ArrayList<>();
+		FinalInterval interval;
+		long[] min = new long[dataset.numDimensions()];
+		long[] max = new long[dataset.numDimensions()];
+
+		min[dataset.dimensionIndex(Axes.X)] = dataset.min(dataset.dimensionIndex(Axes.X));
+		min[dataset.dimensionIndex(Axes.Y)] = dataset.min(dataset.dimensionIndex(Axes.Y));
+
+		max[dataset.dimensionIndex(Axes.X)] = dataset.max(dataset.dimensionIndex(Axes.X));
+		max[dataset.dimensionIndex(Axes.Y)] = dataset.max(dataset.dimensionIndex(Axes.Y));
+
+		int index1 = dataset.dimensionIndex(Axes.TIME);
+		int index2 = -1;
+		if (index1 == 1) {
+			index1 = dataset.dimensionIndex(Axes.CHANNEL);
+		} else {
+			index2 = dataset.dimensionIndex(Axes.CHANNEL);
+		}
+
+		for (int i = 0; i < dataset.dimension(index1); i++) {
+			min[index1] = i;
+			max[index1] = i;
+			if (index2 != -1) {
+				for (int j = 0; j < dataset.dimension(Axes.CHANNEL); j++) {
+					min[index2] = j;
+					max[index2] = j;
+					interval = new FinalInterval(min, max);
+					intervals.add(interval);
+				}
+			} else {
+				interval = new FinalInterval(min, max);
+				intervals.add(interval);
+			}
+
+		}
+		return intervals;
+	}
+
+	protected <T extends RealType<T>> Dataset applyGaussianFilter(Dataset input, double gaussianFilterSize) {
+		Dataset dataset = input.duplicate();
+
+		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(Axes.Y) };
+
+		RandomAccessibleInterval<T> out = (RandomAccessibleInterval<T>) ops.create().img(dataset.getImgPlus());
+
+		double[] sigmas = new double[] { gaussianFilterSize, gaussianFilterSize };
+		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.gauss", dataset.getImgPlus(), sigmas);
+		ops.slice(out, (RandomAccessibleInterval<T>) dataset.getImgPlus(), op, fixedAxisIndices);
+
+		return matchRAIToDataset(out, dataset);
 	}
 
 }
