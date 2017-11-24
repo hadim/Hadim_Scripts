@@ -16,8 +16,12 @@ import net.imglib2.FinalInterval;
 import net.imglib2.Interval;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.cache.img.DiskCachedCellImgFactory;
+import net.imglib2.cache.img.DiskCachedCellImgOptions;
+import net.imglib2.cache.img.DiskCachedCellImgOptions.CacheType;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
@@ -68,6 +72,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrectionXYPlaneIterate(Dataset input,
 			double gaussianFilterSize) {
+
 		Dataset dataset = input.duplicate();
 
 		if (dataset.dimension(Axes.Z) > 1) {
@@ -141,7 +146,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {
-		Dataset dataset = input.duplicate();
+		Dataset dataset = this.createCachedDuplicate(input);
 
 		// Get Gaussian filtered image and use it as a background
 		status.showStatus("Apply Gaussian filter to estimate the background.");

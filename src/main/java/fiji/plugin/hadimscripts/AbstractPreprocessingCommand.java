@@ -3,6 +3,8 @@ package fiji.plugin.hadimscripts;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scijava.app.StatusService;
@@ -19,8 +21,12 @@ import net.imagej.ops.OpService;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.cache.img.DiskCachedCellImgFactory;
+import net.imglib2.cache.img.DiskCachedCellImgOptions;
+import net.imglib2.cache.img.DiskCachedCellImgOptions.CacheType;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 public abstract class AbstractPreprocessingCommand implements Command {
 
@@ -127,9 +133,7 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		return intervals;
 	}
 
-	protected <T extends RealType<T>> Dataset applyGaussianFilter(Dataset input, double gaussianFilterSize) {
-		Dataset dataset = input.duplicate();
-
+	protected <T extends RealType<T>> Dataset applyGaussianFilter(Dataset dataset, double gaussianFilterSize) {
 		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(Axes.Y) };
 
 		RandomAccessibleInterval<T> out = (RandomAccessibleInterval<T>) ops.create().img(dataset.getImgPlus());
@@ -139,6 +143,37 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		ops.slice(out, (RandomAccessibleInterval<T>) dataset.getImgPlus(), op, fixedAxisIndices);
 
 		return matchRAIToDataset(out, dataset);
+	}
+	
+	protected <T extends RealType<T>> Dataset createCachedDuplicate(Dataset dataset) {
+		int cellCacheSize = 32;
+		int maxCacheSize = 10;
+		CacheType cachType = CacheType.BOUNDED;
+
+		long[] dims = LongStream.range(0, dataset.numDimensions()).map(i -> dataset.dimension((int) i)).toArray();
+
+		// Print dimensions
+		LongStream.range(0, dims.length).forEach(i -> System.out.print(dims[(int) i] + ", "));
+
+		// Create cell dimensions for cached data
+		int[] cellDimensions = IntStream.range(0, dims.length).map(i -> cellCacheSize).toArray();
+
+		// Setup options for the cached image
+		final DiskCachedCellImgOptions options = new DiskCachedCellImgOptions().cellDimensions(cellDimensions)
+				.cacheType(cachType).maxCacheSize(maxCacheSize);
+
+		DiskCachedCellImgFactory factory = new DiskCachedCellImgFactory(options);
+
+		// TODO: set the correct type of the source image
+		Img<T> img = factory.create(dims, new DoubleType());
+				
+		Dataset output = ds.create(img);
+		output = matchRAIToDataset(output, dataset);
+		
+		// Copy pixels to the new image
+		output.copyDataFrom(dataset);
+		
+		return output;
 	}
 
 }
