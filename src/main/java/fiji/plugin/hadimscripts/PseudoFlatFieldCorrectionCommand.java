@@ -116,7 +116,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 			status.showProgress(i, intervals.size() - 1);
 		}
 
-		RandomAccessibleInterval im = ops.transform().stack(stack);
+		RandomAccessibleInterval im = ops.transform().stackView(stack);
 
 		if (dataset.numDimensions() != im.numDimensions()) {
 
