@@ -10,7 +10,7 @@ import os
 from ij import IJ
 from ij.plugin.frame import RoiManager
 
-import fiji.plugin.kymographbuilder.KymographFactory as KFactory
+import sc.fiji.kymographBuilder.KymographFactory as KFactory
 
 rm = RoiManager.getInstance()
 counter = 0
