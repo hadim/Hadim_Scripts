@@ -74,7 +74,7 @@ for j, r in enumerate(range(len(rois)-1)):
 		padded_frame = ops.run("transform.extendZeroView", single_frame)
 
 		# Do the translation
-		translated_frame = ops.transform().translate(padded_frame, [dx, dy, 0])
+		translated_frame = ops.transform().translateView(padded_frame, [dx, dy, 0])
 
 		# Cleanup
 		translated_frame = Views.interval(translated_frame, intervals)
