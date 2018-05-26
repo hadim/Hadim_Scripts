@@ -21,7 +21,7 @@ public class Test {
 		DatasetService ds = ij.dataset();
 
 		String fpath = "/home/hadim/.doc/Code/Postdoc/ij/testdata/7,5uM_emccd_lapse1-small-8bit.tif";
-		Dataset dataset = ij.dataset().open(fpath);
+		Dataset dataset = (Dataset) ij.io().open(fpath);
 		ij.ui().show(dataset);
 	}
 }
