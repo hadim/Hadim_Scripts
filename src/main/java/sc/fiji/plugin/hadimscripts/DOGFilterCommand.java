@@ -1,9 +1,5 @@
-package sc.fiji.plugin.hadimscripts;
 
-import org.scijava.ItemIO;
-import org.scijava.command.ContextCommand;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+package sc.fiji.plugin.hadimscripts;
 
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
@@ -12,6 +8,11 @@ import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
+
+import org.scijava.ItemIO;
+import org.scijava.command.ContextCommand;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 @Plugin(type = ContextCommand.class, menuPath = "Plugins>Hadim>DOG Filter")
 public class DOGFilterCommand extends AbstractPreprocessingCommand {
@@ -55,7 +56,8 @@ public class DOGFilterCommand extends AbstractPreprocessingCommand {
 
 		Dataset dataset = input.duplicate();
 
-		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(Axes.Y) };
+		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(
+			Axes.Y) };
 
 		// Convert to 32 bits
 		Img<FloatType> out = (Img<FloatType>) ops.run("convert.float32", dataset.getImgPlus());
@@ -67,8 +69,8 @@ public class DOGFilterCommand extends AbstractPreprocessingCommand {
 
 		// Clip intensities
 		Img<T> out3 = (Img<T>) ops.create().img(dataset.getImgPlus());
-		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus().firstElement(),
-				out2.firstElement());
+		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus()
+			.firstElement(), out2.firstElement());
 		ops.convert().imageType(out3, out2, op2);
 
 		return matchRAIToDataset(out3, dataset);

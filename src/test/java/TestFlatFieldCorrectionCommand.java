@@ -1,14 +1,14 @@
 import java.util.HashMap;
 import java.util.Map;
 
+import net.imagej.Dataset;
+import net.imagej.ImageJ;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.Context;
 import org.scijava.command.CommandModule;
 
 import sc.fiji.plugin.hadimscripts.PseudoFlatFieldCorrectionCommand;
-
-import net.imagej.Dataset;
-import net.imagej.ImageJ;
-import net.imglib2.type.numeric.RealType;
 
 public class TestFlatFieldCorrectionCommand {
 
@@ -30,7 +30,8 @@ public class TestFlatFieldCorrectionCommand {
 		parameters.put("saveImage", false);
 		parameters.put("suffix", "");
 
-		CommandModule module = ij.command().run(PseudoFlatFieldCorrectionCommand.class, true, parameters).get();
+		CommandModule module = ij.command().run(PseudoFlatFieldCorrectionCommand.class, true,
+			parameters).get();
 		Dataset output = (Dataset) module.getOutput("output");
 	}
 

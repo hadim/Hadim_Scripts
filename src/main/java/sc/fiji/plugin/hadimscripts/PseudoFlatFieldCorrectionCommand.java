@@ -1,13 +1,8 @@
+
 package sc.fiji.plugin.hadimscripts;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.scijava.ItemIO;
-import org.scijava.command.ContextCommand;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-import org.scijava.ui.UIService;
 
 import net.imagej.Dataset;
 import net.imagej.axis.Axes;
@@ -22,6 +17,12 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
 
+import org.scijava.ItemIO;
+import org.scijava.command.ContextCommand;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.ui.UIService;
+
 @Plugin(type = ContextCommand.class, menuPath = "Plugins>Hadim>Pseudo Flat-Field Correction")
 public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingCommand {
 
@@ -31,16 +32,18 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 	@Parameter(type = ItemIO.INPUT, description = "Source Image")
 	private Dataset input;
 
-	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)", description = "The size of the Gaussian filter used to estimate the background. Higher is this value, "
-			+ "bigger will be the features used to estimate the background. For example, to filter "
-			+ "an uneven background in fluorescent images, you can use try a size corresponding to 10% of "
-			+ "the size of your image.")
+	@Parameter(type = ItemIO.INPUT, min = "0", label = "Gaussian Filter Size (pixel)",
+		description = "The size of the Gaussian filter used to estimate the background. Higher is this value, " +
+			"bigger will be the features used to estimate the background. For example, to filter " +
+			"an uneven background in fluorescent images, you can use try a size corresponding to 10% of " +
+			"the size of your image.")
 	private Integer gaussianFilterSize = 50;
 
 	@Parameter(type = ItemIO.INPUT, label = "Normalize Intensity", required = false)
 	private Boolean normalizeIntensity = true;
 
-	@Parameter(type = ItemIO.INPUT, label = "Iterate over XY planes (reduce memory usage)", required = false)
+	@Parameter(type = ItemIO.INPUT, label = "Iterate over XY planes (reduce memory usage)",
+		required = false)
 	private Boolean iteratePlane = false;
 
 	@Parameter(type = ItemIO.INPUT, label = "Save result image (if possible)", required = false)
@@ -57,7 +60,8 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 
 		if (this.iteratePlane) {
 			this.output = doPseudoFlatFieldCorrectionXYPlaneIterate(this.input, this.gaussianFilterSize);
-		} else {
+		}
+		else {
 			this.output = doPseudoFlatFieldCorrection(this.input, this.gaussianFilterSize);
 		}
 
@@ -67,12 +71,13 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 	}
 
 	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrectionXYPlaneIterate(Dataset input,
-			double gaussianFilterSize) {
+		double gaussianFilterSize)
+	{
 		Dataset dataset = input.duplicate();
 
 		if (dataset.dimension(Axes.Z) > 1) {
-			log.error("The \"iterate over XY planes\" option cannot be used with more " + "than one Z stack ("
-					+ dataset.dimension(Axes.Z) + " detected).");
+			log.error("The \"iterate over XY planes\" option cannot be used with more " +
+				"than one Z stack (" + dataset.dimension(Axes.Z) + " detected).");
 			return null;
 		}
 
@@ -108,7 +113,7 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 
 			// Convert back to the original type
 			converter = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus().firstElement(),
-					subtracted.firstElement());
+				subtracted.firstElement());
 			ops.convert().imageType(out, subtracted, converter);
 
 			stack.add((RandomAccessibleInterval) out);
@@ -122,17 +127,18 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 
 			long middleDimension = im.dimension(2) / dataset.dimension(Axes.CHANNEL);
 			Interval interval1 = Intervals.createMinMax(0, 0, 0, im.dimension(0) - 1, im.dimension(1) - 1,
-					middleDimension - 1);
-			Interval interval2 = Intervals.createMinMax(0, 0, middleDimension, im.dimension(0) - 1, im.dimension(1) - 1,
-					im.dimension(2) - 1);
+				middleDimension - 1);
+			Interval interval2 = Intervals.createMinMax(0, 0, middleDimension, im.dimension(0) - 1, im
+				.dimension(1) - 1, im.dimension(2) - 1);
 
 			RandomAccessibleInterval offsetInterval1 = Views.offsetInterval(im, interval1);
 			RandomAccessibleInterval offsetInterval2 = Views.offsetInterval(im, interval2);
 
 			im = Views.stack(offsetInterval1, offsetInterval2);
 
-			if (dataset.dimension(dataset.dimensionIndex(Axes.CHANNEL)) != im
-					.dimension(dataset.dimensionIndex(Axes.CHANNEL))) {
+			if (dataset.dimension(dataset.dimensionIndex(Axes.CHANNEL)) != im.dimension(dataset
+				.dimensionIndex(Axes.CHANNEL)))
+			{
 				im = Views.permute(im, 2, 3);
 			}
 		}
@@ -140,7 +146,9 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 		return this.matchRAIToDataset(im, dataset);
 	}
 
-	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input, double gaussianFilterSize) {
+	public <T extends RealType<T>> Dataset doPseudoFlatFieldCorrection(Dataset input,
+		double gaussianFilterSize)
+	{
 		Dataset dataset = input.duplicate();
 
 		// Get Gaussian filtered image and use it as a background
@@ -151,11 +159,11 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 
 		// Convert to 32 bits
 		IterableInterval<FloatType> out = (IterableInterval<FloatType>) ops.run("convert.float32",
-				dataset.getImgPlus());
+			dataset.getImgPlus());
 		IterableInterval<FloatType> original = (IterableInterval<FloatType>) ops.run("convert.float32",
-				dataset.getImgPlus());
-		IterableInterval<FloatType> backgroundFloat = (IterableInterval<FloatType>) ops.run("convert.float32",
-				background.getImgPlus());
+			dataset.getImgPlus());
+		IterableInterval<FloatType> backgroundFloat = (IterableInterval<FloatType>) ops.run(
+			"convert.float32", background.getImgPlus());
 
 		// Do subtraction
 		status.showStatus("Subtract image to background.");
@@ -166,15 +174,15 @@ public class PseudoFlatFieldCorrectionCommand extends AbstractPreprocessingComma
 
 		// Clip intensities to input image type
 		Img<T> out3 = (Img<T>) ops.create().img(dataset.getImgPlus());
-		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus().firstElement(),
-				out2.firstElement());
+		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus()
+			.firstElement(), out2.firstElement());
 		ops.convert().imageType(out3, out2, op2);
 
 		Img<T> out4 = out3;
 		if (normalizeIntensity) {
 			out4 = (Img<T>) ops.create().img(out3);
-			RealTypeConverter scaleOp = (RealTypeConverter) ops.op("convert.normalizeScale", out4.firstElement(),
-					out3.firstElement());
+			RealTypeConverter scaleOp = (RealTypeConverter) ops.op("convert.normalizeScale", out4
+				.firstElement(), out3.firstElement());
 			ops.convert().imageType(out4, out3, scaleOp);
 		}
 

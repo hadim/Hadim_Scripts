@@ -1,16 +1,12 @@
+
 package sc.fiji.plugin.hadimscripts;
+
+import io.scif.services.DatasetIOService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
-import org.scijava.app.StatusService;
-import org.scijava.command.Command;
-import org.scijava.log.LogService;
-import org.scijava.plugin.Parameter;
-
-import io.scif.services.DatasetIOService;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
@@ -21,6 +17,12 @@ import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
+
+import org.apache.commons.io.FilenameUtils;
+import org.scijava.app.StatusService;
+import org.scijava.command.Command;
+import org.scijava.log.LogService;
+import org.scijava.plugin.Parameter;
 
 public abstract class AbstractPreprocessingCommand implements Command {
 
@@ -45,21 +47,26 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		if (input != null && input.getSource() != null) {
 			// Create new filename
 			String extension = FilenameUtils.getExtension(input.getSource());
-			String newFilename = FilenameUtils.removeExtension(input.getSource()) + suffix + "." + extension;
+			String newFilename = FilenameUtils.removeExtension(input.getSource()) + suffix + "." +
+				extension;
 
 			// Save output image
 			try {
 				dsio.save(output, newFilename);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				log.error("Cannot save the output image to disk because : " + e.getLocalizedMessage());
 			}
-		} else {
-			status.showStatus(
-					"Output image cannot be saved on disk because the input " + "image is not saved on disk.");
+		}
+		else {
+			status.showStatus("Output image cannot be saved on disk because the input " +
+				"image is not saved on disk.");
 		}
 	}
 
-	protected <T extends RealType<T>> Dataset matchRAIToDataset(RandomAccessibleInterval<T> rai, Dataset dataset) {
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(RandomAccessibleInterval<T> rai,
+		Dataset dataset)
+	{
 		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
 		for (int i = 0; i < axes.length; i++) {
 			axes[i] = dataset.axis(i);
@@ -104,7 +111,8 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		int index2 = -1;
 		if (index1 == -1) {
 			index1 = dataset.dimensionIndex(Axes.TIME);
-		} else {
+		}
+		else {
 			index2 = dataset.dimensionIndex(Axes.TIME);
 		}
 
@@ -118,7 +126,8 @@ public abstract class AbstractPreprocessingCommand implements Command {
 					interval = new FinalInterval(min, max);
 					intervals.add(interval);
 				}
-			} else {
+			}
+			else {
 				interval = new FinalInterval(min, max);
 				intervals.add(interval);
 			}
@@ -127,12 +136,16 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		return intervals;
 	}
 
-	protected <T extends RealType<T>> Dataset applyGaussianFilter(Dataset input, double gaussianFilterSize) {
+	protected <T extends RealType<T>> Dataset applyGaussianFilter(Dataset input,
+		double gaussianFilterSize)
+	{
 		Dataset dataset = input.duplicate();
 
-		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(Axes.Y) };
+		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(
+			Axes.Y) };
 
-		RandomAccessibleInterval<T> out = (RandomAccessibleInterval<T>) ops.create().img(dataset.getImgPlus());
+		RandomAccessibleInterval<T> out = (RandomAccessibleInterval<T>) ops.create().img(dataset
+			.getImgPlus());
 
 		double[] sigmas = new double[] { gaussianFilterSize, gaussianFilterSize };
 		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.gauss", dataset.getImgPlus(), sigmas);
