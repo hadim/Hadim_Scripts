@@ -4,7 +4,8 @@ import java.util.Map;
 import org.scijava.Context;
 import org.scijava.command.CommandModule;
 
-import fiji.plugin.hadimscripts.PseudoFlatFieldCorrectionCommand;
+import sc.fiji.plugin.hadimscripts.PseudoFlatFieldCorrectionCommand;
+
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import net.imglib2.type.numeric.RealType;

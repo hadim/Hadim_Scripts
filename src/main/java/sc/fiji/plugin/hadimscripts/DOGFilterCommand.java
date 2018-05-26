@@ -1,4 +1,4 @@
-package fiji.plugin.hadimscripts;
+package sc.fiji.plugin.hadimscripts;
 
 import org.scijava.ItemIO;
 import org.scijava.command.ContextCommand;

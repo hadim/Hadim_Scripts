@@ -1,4 +1,4 @@
-package fiji.plugin.hadimscripts;
+package sc.fiji.plugin.hadimscripts;
 
 import java.io.IOException;
 import java.util.ArrayList;

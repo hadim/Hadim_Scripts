@@ -1,4 +1,4 @@
-package fiji.plugin.hadimscripts;
+package sc.fiji.plugin.hadimscripts;
 
 import java.util.ArrayList;
 import java.util.List;
