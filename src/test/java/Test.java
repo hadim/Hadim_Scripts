@@ -1,18 +1,19 @@
-import org.scijava.Context;
-import org.scijava.log.LogService;
-
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImageJ;
 import net.imagej.ops.OpService;
 import net.imglib2.type.numeric.RealType;
 
+import org.scijava.Context;
+import org.scijava.log.LogService;
+
 public class Test {
 
 	// Launch ImageJ and open and Image
 	public static <T extends RealType<T>> void main(final String... args) throws Exception {
 
-		final ImageJ ij = net.imagej.Main.launch(args);
+		final ImageJ ij = new ImageJ();
+		ij.ui().showUI();
 		Context context = ij.getContext();
 
 		LogService log = ij.log();
