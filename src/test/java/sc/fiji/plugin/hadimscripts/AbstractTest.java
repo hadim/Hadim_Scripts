@@ -41,6 +41,9 @@ public class AbstractTest {
 		if (context != null) {
 			context.dispose();
 			context = null;
+			log = null;
+			io = null;
+			command = null;
 		}
 	}
 
