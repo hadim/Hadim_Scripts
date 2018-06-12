@@ -15,7 +15,7 @@
 
 	<name>hadim-scripts</name>
 	<description>A set of plugins/macros/script for Fiji.</description>
-	<url>https://github.com/hadim/fiji_scripts</url>
+	<url>https://github.com/hadim/Hadim_Scripts</url>
 	<inceptionYear>2016</inceptionYear>
 
 	<organization>
@@ -79,7 +79,7 @@
 	</contributors>
 
 	<properties>
-		<package-name>fiji_scripts</package-name>
+		<package-name>Hadim_Scripts</package-name>
 		<license.licenseName>mit</license.licenseName>
 		<license.copyrightOwners>Hadrien Mary</license.copyrightOwners>
 
@@ -95,14 +95,14 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/hadim/fiji_scripts</connection>
-		<developerConnection>scm:git:git@github.com:hadim/fiji_scripts</developerConnection>
+		<connection>scm:git:git://github.com/hadim/Hadim_Scripts</connection>
+		<developerConnection>scm:git:git@github.com:hadim/Hadim_Scripts</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/hadim/fiji_scripts</url>
+		<url>https://github.com/hadim/Hadim_Scripts</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/hadim/fiji_scripts/issues</url>
+		<url>https://github.com/hadim/Hadim_Scripts/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Travis</system>
