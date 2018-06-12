@@ -1,3 +1,4 @@
+package sc.fiji.plugin.hadimscripts;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.ImageJ;
