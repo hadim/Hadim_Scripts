@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>hadim-scripts</artifactId>
-	<version>1.4.2-SNAPSHOT</version>
+	<version>1.4.2</version>
 	<packaging>jar</packaging>
 
 	<name>hadim-scripts</name>
@@ -97,7 +97,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/hadim/Hadim_Scripts</connection>
 		<developerConnection>scm:git:git@github.com:hadim/Hadim_Scripts</developerConnection>
-		<tag>HEAD</tag>
+		<tag>hadim-scripts-1.4.2</tag>
 		<url>https://github.com/hadim/Hadim_Scripts</url>
 	</scm>
 	<issueManagement>
