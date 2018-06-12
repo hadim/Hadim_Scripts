@@ -37,22 +37,23 @@ for channel_index in range(channel_dims):
 	        start_indexes = [0, 0, channel_index, t]
 	        end_indexes = [stack.getWidth()-1, stack.getHeight()-1, channel_index, t]
 
-        view = ij.op().transform().interval(stack, start_indexes, end_indexes)
+        view = ij.op().transform().intervalView(stack, start_indexes, end_indexes)
         sum_pixels = ij.op().stats().sum(view).get()
 
         if sum_pixels == 0:
 
             if non_zero_image_time_index >= 0:
-                #print("Copy {} to {}".format(non_zero_image_time_index, t))
-                viewOut = ij.op().transform().interval(output, start_indexes, end_indexes)
+  
+                viewOut = ij.op().transform().intervalView(output, start_indexes, end_indexes)
                 if stack.numDimensions() == 3:
-	                viewIn = ij.op().transform().interval(stack,
-	                                                      [0, 0, non_zero_image_time_index],
-	                                                      [stack.getWidth()-1, stack.getHeight()-1, non_zero_image_time_index])
+                	start = [0, 0, non_zero_image_time_index]
+                	end = [stack.getWidth()-1, stack.getHeight()-1, non_zero_image_time_index]
+	                viewIn = ij.op().transform().intervalView(stack, start, end)
+	                
                 elif stack.numDimensions() == 4:
-	                viewIn = ij.op().transform().interval(stack,
-	                                                      [0, 0, channel_index, non_zero_image_time_index],
-	                                                      [stack.getWidth()-1, stack.getHeight()-1, channel_index, non_zero_image_time_index])
+                	start = [0, 0, channel_index, non_zero_image_time_index]
+                	end = [stack.getWidth()-1, stack.getHeight()-1, channel_index, non_zero_image_time_index]
+	                viewIn = ij.op().transform().intervalView(stack, start, end)
 
                 ij.op().copy().iterableInterval(viewOut, viewIn)
         else:
