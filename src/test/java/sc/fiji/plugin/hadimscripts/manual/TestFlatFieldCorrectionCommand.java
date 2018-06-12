@@ -1,4 +1,4 @@
-package sc.fiji.plugin.hadimscripts;
+package sc.fiji.plugin.hadimscripts.manual;
 import java.util.HashMap;
 import java.util.Map;
 
