@@ -44,27 +44,48 @@ public abstract class AbstractPreprocessingCommand implements Command {
 	protected void saveImage(Dataset input, Dataset output, String suffix) {
 
 		// Check if input is saved on disk
-		if (input != null && input.getSource() != null) {
-			// Create new filename
-			String extension = FilenameUtils.getExtension(input.getSource());
-			String newFilename = FilenameUtils.removeExtension(input.getSource()) + suffix + "." +
-				extension;
+		if (input != null && input.getSource() != null && input.getSource() != "") {
+
+			String newFilename = this.suffixPath(input.getSource(), suffix);
 
 			// Save output image
 			try {
 				dsio.save(output, newFilename);
+				log.info("Preprocessed image saved at " + newFilename);
 			}
 			catch (IOException e) {
-				log.error("Cannot save the output image to disk because : " + e.getLocalizedMessage());
+				log.error("Cannot save the output image to disk because : " + e
+					.getLocalizedMessage());
 			}
 		}
 		else {
-			status.showStatus("Output image cannot be saved on disk because the input " +
-				"image is not saved on disk.");
+			status.showStatus(
+				"Output image cannot be saved on disk because the input " +
+					"image is not saved on disk.");
 		}
 	}
 
-	protected <T extends RealType<T>> Dataset matchRAIToDataset(RandomAccessibleInterval<T> rai,
+	protected String suffixPath(String path, String suffix) {
+		String extension = FilenameUtils.getExtension(path);
+		String newFilename = FilenameUtils.removeExtension(path) + suffix + "." +
+			extension;
+
+		return newFilename;
+	}
+
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(
+		RandomAccessibleInterval<T> rai, Dataset dataset)
+	{
+		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
+		for (int i = 0; i < axes.length; i++) {
+			axes[i] = dataset.axis(i);
+		}
+		Dataset output = ds.create(rai);
+		output.setAxes(axes);
+		return output;
+	}
+
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(Img<T> rai,
 		Dataset dataset)
 	{
 		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
@@ -76,17 +97,9 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		return output;
 	}
 
-	protected <T extends RealType<T>> Dataset matchRAIToDataset(Img<T> rai, Dataset dataset) {
-		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
-		for (int i = 0; i < axes.length; i++) {
-			axes[i] = dataset.axis(i);
-		}
-		Dataset output = ds.create(rai);
-		output.setAxes(axes);
-		return output;
-	}
-
-	protected <T extends RealType<T>> Dataset matchRAIToDataset(Dataset original, Dataset dataset) {
+	protected <T extends RealType<T>> Dataset matchRAIToDataset(Dataset original,
+		Dataset dataset)
+	{
 		CalibratedAxis[] axes = new CalibratedAxis[dataset.numDimensions()];
 		for (int i = 0; i < axes.length; i++) {
 			axes[i] = dataset.axis(i);
@@ -101,11 +114,15 @@ public abstract class AbstractPreprocessingCommand implements Command {
 		long[] min = new long[dataset.numDimensions()];
 		long[] max = new long[dataset.numDimensions()];
 
-		min[dataset.dimensionIndex(Axes.X)] = dataset.min(dataset.dimensionIndex(Axes.X));
-		min[dataset.dimensionIndex(Axes.Y)] = dataset.min(dataset.dimensionIndex(Axes.Y));
+		min[dataset.dimensionIndex(Axes.X)] = dataset.min(dataset.dimensionIndex(
+			Axes.X));
+		min[dataset.dimensionIndex(Axes.Y)] = dataset.min(dataset.dimensionIndex(
+			Axes.Y));
 
-		max[dataset.dimensionIndex(Axes.X)] = dataset.max(dataset.dimensionIndex(Axes.X));
-		max[dataset.dimensionIndex(Axes.Y)] = dataset.max(dataset.dimensionIndex(Axes.Y));
+		max[dataset.dimensionIndex(Axes.X)] = dataset.max(dataset.dimensionIndex(
+			Axes.X));
+		max[dataset.dimensionIndex(Axes.Y)] = dataset.max(dataset.dimensionIndex(
+			Axes.Y));
 
 		int index1 = dataset.dimensionIndex(Axes.CHANNEL);
 		int index2 = -1;
@@ -141,15 +158,17 @@ public abstract class AbstractPreprocessingCommand implements Command {
 	{
 		Dataset dataset = input.duplicate();
 
-		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(
-			Axes.Y) };
+		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset
+			.dimensionIndex(Axes.Y) };
 
-		RandomAccessibleInterval<T> out = (RandomAccessibleInterval<T>) ops.create().img(dataset
-			.getImgPlus());
+		RandomAccessibleInterval<T> out = (RandomAccessibleInterval<T>) ops.create()
+			.img(dataset.getImgPlus());
 
 		double[] sigmas = new double[] { gaussianFilterSize, gaussianFilterSize };
-		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.gauss", dataset.getImgPlus(), sigmas);
-		ops.slice(out, (RandomAccessibleInterval<T>) dataset.getImgPlus(), op, fixedAxisIndices);
+		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.gauss", dataset
+			.getImgPlus(), sigmas);
+		ops.slice(out, (RandomAccessibleInterval<T>) dataset.getImgPlus(), op,
+			fixedAxisIndices);
 
 		return matchRAIToDataset(out, dataset);
 	}

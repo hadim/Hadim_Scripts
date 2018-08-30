@@ -44,9 +44,12 @@ public class DOGFilterCommand extends AbstractPreprocessingCommand {
 		if (this.saveImage) {
 			this.saveImage(this.input, this.output, this.suffix);
 		}
+		this.output.setSource(this.suffixPath(this.input.getSource(), this.suffix));
 	}
 
-	public <T extends RealType<T>> Dataset applyDOGFilter(Dataset input, int sigma1, int sigma2) {
+	public <T extends RealType<T>> Dataset applyDOGFilter(Dataset input,
+		int sigma1, int sigma2)
+	{
 
 		if (sigma1 < sigma2) {
 			int tmp = sigma1;
@@ -56,21 +59,23 @@ public class DOGFilterCommand extends AbstractPreprocessingCommand {
 
 		Dataset dataset = input.duplicate();
 
-		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset.dimensionIndex(
-			Axes.Y) };
+		int[] fixedAxisIndices = new int[] { dataset.dimensionIndex(Axes.X), dataset
+			.dimensionIndex(Axes.Y) };
 
 		// Convert to 32 bits
-		Img<FloatType> out = (Img<FloatType>) ops.run("convert.float32", dataset.getImgPlus());
+		Img<FloatType> out = (Img<FloatType>) ops.run("convert.float32", dataset
+			.getImgPlus());
 
 		// Apply filter
 		Img<FloatType> out2 = ops.create().img(out);
-		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.dog", out, sigma1, sigma2);
+		UnaryComputerOp op = (UnaryComputerOp) ops.op("filter.dog", out, sigma1,
+			sigma2);
 		ops.slice(out2, out, op, fixedAxisIndices);
 
 		// Clip intensities
 		Img<T> out3 = (Img<T>) ops.create().img(dataset.getImgPlus());
-		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset.getImgPlus()
-			.firstElement(), out2.firstElement());
+		RealTypeConverter op2 = (RealTypeConverter) ops.op("convert.clip", dataset
+			.getImgPlus().firstElement(), out2.firstElement());
 		ops.convert().imageType(out3, out2, op2);
 
 		return matchRAIToDataset(out3, dataset);

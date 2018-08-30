@@ -1,4 +1,10 @@
+# @Float(label="Sigma 1", value=6) sigma1
+# @Float(label="Sigma 2", value=2) sigma2
+# @Float(label="Gaussian Filter Size", value=50) gaussian_filter_size
+# @Boolean(label="Iterate XY plane (reduce memory usage)", value=False) iterate_plane
+# @Boolean(label="Save Preprocessed Image", value=False) save_image
 # @Dataset data
+
 # @CommandService cs
 # @ModuleService ms
 # @PluginService ps
@@ -19,18 +25,18 @@ def runCommand(inputs, command, showOutputs=False):
 	return module
 
 inputs = {"input": data,
-          "sigma1": 6,
-          "sigma2": 2,
+          "sigma1": sigma1,
+          "sigma2": sigma2,
           "normalizeIntensity": True,
           "saveImage": False,
-          "suffix": "-Preprocessed"}
+          "suffix": ""}
 module = runCommand(inputs, DOGFilterCommand, showOutputs=False)
 filtered_dataset = module.getOutput("output")
 
 inputs = {"input": filtered_dataset,
-          "gaussianFilterSize": 50,
+          "gaussianFilterSize": gaussian_filter_size,
           "normalizeIntensity": True,
-          "iteratePlane": False,
-          "saveImage": False,
+          "iteratePlane": iterate_plane,
+          "saveImage": save_image,
           "suffix": "-Preprocessed"}
 module = runCommand(inputs, PseudoFlatFieldCorrectionCommand, showOutputs=True)
