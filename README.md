@@ -29,11 +29,6 @@ The package also contains very specific small plugins (often wrappers around [Im
 - `Pseudo Flat-Field Correction` : A preprocessing step that try to remove the backgound from your image.
 - `DOG Filter` : A preprocessing step that filter small and large features from your image.
 
-
-## The `ij2_tools` library
-
-The package also contains a [Python library](src/main/resources/ij2_tools) for ImageJ (not maintained anymore).
-
 ## License
 
 Under BSD license. See [LICENSE](LICENSE).
