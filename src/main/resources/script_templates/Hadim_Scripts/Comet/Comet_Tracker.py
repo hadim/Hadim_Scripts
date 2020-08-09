@@ -60,7 +60,7 @@ if show_images:
 masked = apply_mask(ij, dog, thresholded, save=save_images, output_dir=output_dir)
 if show_images:
 	ij.ui().show("masked", masked)
-	
+
 ## Get particles on each timepoints
 patches_list = []
 axis = Axes.TIME
@@ -77,21 +77,21 @@ for t in range(thresholded.dimension(axis)):
 	except Exception:
 		regions_frame = []
 
-	log.info("Get %i particles on frame %i" % (len(regions_frame), t))
+	print("Get %i particles on frame %i" % (len(regions_frame), t))
 
 	# Create patch for each particles
 	# TODO : use Views only ?
 	for i, region in enumerate(regions_frame):
 		center = region.getCenterOfMass()
 		origin = [center.getDoublePosition(d) for d in range(0, frame_masked.numDimensions())]
-	
+
 		# TODO : Adjust the orientation according to the particle
 		orientation = 0
 
 		rect = [[int(round(p - (patch_size//2))), int(round((p + patch_size//2)))] for p in origin]
 		intervals = {'X' : rect[0],
 		             'Y' : rect[1]}
-		
+
 		patch = crop(ij, ij.dataset().create(frame_raw), intervals)
 		patch = rotate_stack(ij, patch, orientation)
 		patches_list.append(patch)
@@ -115,7 +115,7 @@ ij.ui().show("patches", patches)
 
 if save_images:
     fname = os.path.join(output_dir, "Patches.tif")
-    ij.log().info("Saving at %s" % fname)
+    print("Saving at %s" % fname)
     ij.io().save(patches, fname)
 
 # Do the mean of all the patches = average comet

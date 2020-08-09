@@ -51,7 +51,7 @@ public abstract class AbstractPreprocessingCommand implements Command {
 			// Save output image
 			try {
 				dsio.save(output, newFilename);
-				log.info("Preprocessed image saved at " + newFilename);
+				print("Preprocessed image saved at " + newFilename);
 			}
 			catch (IOException e) {
 				log.error("Cannot save the output image to disk because : " + e

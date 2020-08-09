@@ -28,7 +28,7 @@ for roi in rm.getRoisAsArray():
 
         kfactory = KFactory(context, dataset, roi)
         kfactory.build()
-        
+
         kymo = kfactory.getKymograph()
         ij.ui().show(title, kymo)
 
@@ -41,4 +41,4 @@ for roi in rm.getRoisAsArray():
 roi_path = os.path.join(parent_folder, os.path.splitext(dataset.getName())[0] + ".zip")
 rm.runCommand("Save", roi_path)
 
-log.info("MultiKymographBuilder Finished. " + str(counter) + " ROIs processed")
+print("MultiKymographBuilder Finished. " + str(counter) + " ROIs processed")

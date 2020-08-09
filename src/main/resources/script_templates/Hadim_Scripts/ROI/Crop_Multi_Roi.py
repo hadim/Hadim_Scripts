@@ -41,22 +41,22 @@ def main():
 
     print(dataset.dimensionIndex(Axes.X))
 
-    ij.log().info('Image filename is %s' % fname)
-    ij.log().info('Detected dimensions : ')
-    ij.log().info('\tx = %i\n\ty = %i\n\tz = %i\n\tc = %i\n\tt = %i' % (x_len, y_len,
+    print('Image filename is %s' % fname)
+    print('Detected dimensions : ')
+    print('\tx = %i\n\ty = %i\n\tz = %i\n\tc = %i\n\tt = %i' % (x_len, y_len,
                                                                          z_len, c_len,
                                                                          t_len))
-                                                                         
+
     rois = rm.getRoisAsArray()
-    ij.log().info("Detected %i ROIs" % len(rois))
-    ij.log().info("Start cropping")
+    print("Detected %i ROIs" % len(rois))
+    print("Start cropping")
 
     img = dataset.getImgPlus()
-    
+
     for i, roi in enumerate(rois):
 
         crop_id = i + 1
-        ij.log().info("Croping %i / %i" % (crop_id, len(rois)))
+        print("Croping %i / %i" % (crop_id, len(rois)))
 
         # Get filename and basename of the current cropped image
         crop_basename = "crop%i_%s" % (crop_id, dataset.getName())
@@ -84,10 +84,10 @@ def main():
 
         # Save cropped image
         if save_cropped:
-            ij.log().info("Saving crop to %s" % crop_fname)
+            print("Saving crop to %s" % crop_fname)
             ioservice.save(cropped_dataset, crop_fname)
 
-    ij.log().info("%i crop images have been saved in %s" % (len(rois), os.path.dirname(fname)))
-    ij.log().info('Done.')
+    print("%i crop images have been saved in %s" % (len(rois), os.path.dirname(fname)))
+    print('Done.')
 
 main()

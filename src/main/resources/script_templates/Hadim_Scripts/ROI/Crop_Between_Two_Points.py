@@ -37,7 +37,7 @@ unit_length = length / (z_end - z_start)
 # Iterate over each frame in z
 for i, z in enumerate(range(z_start, z_end)):
 
-	ij.log().info("Processing frame %i/%i" % (i + 1, z_end - z_start))
+	print("Processing frame %i/%i" % (i + 1, z_end - z_start))
 
 	d = i * unit_length
 	x = int(round(x_start + (d * (x_end - x_start) / length), 0))
@@ -50,7 +50,7 @@ for i, z in enumerate(range(z_start, z_end)):
 	y2 = int(y + box_size / 2)
 	intervals = Intervals.createMinMax(x1, y1, z, x2 - 1, y2 - 1, z)
 	cropped_img = ops.transform().crop(img, intervals)
-	
+
 	images.append(cropped_img)
 
 cropped_images = ops.run("transform.stackView", [images])

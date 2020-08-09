@@ -13,7 +13,7 @@ from ij.plugin.frame import RoiManager
 from ij import WindowManager
 
 def log_info(message):
-	log.info(message)
+	print(message)
 	print(message)
 
 if dataset.getName().startswith("Kymograph_"):
@@ -35,7 +35,7 @@ for dataset_name in WindowManager.getImageTitles():
 
 		_, roi_id, roi_name = dataset_name.split("_")
 		roi_name = roi_name.split(".")[0]
-		
+
 		if dataset_name.endswith(kymo_extension):
 			roi_path = os.path.join(parent_folder, kymo_folder, dataset_name.replace(kymo_extension, ".zip"))
 		else:
@@ -57,4 +57,3 @@ for dataset_name in WindowManager.getImageTitles():
 
 rm.runCommand("Reset")
 
-		

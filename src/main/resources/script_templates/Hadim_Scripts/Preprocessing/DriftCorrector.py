@@ -13,8 +13,8 @@ from net.imglib2.view import Views
 
 from ij.plugin.frame import RoiManager
 
-ij.ui().showDialog("This script only works with single channel images. " + 
-	"If your script has multiple channels, please use `Image > Color > Split Channels` " + 
+ij.ui().showDialog("This script only works with single channel images. " +
+	"If your script has multiple channels, please use `Image > Color > Split Channels` " +
 	"and apply the script on each individual channel.");
 
 # Initialize some variables
@@ -32,7 +32,7 @@ for j, r in enumerate(range(len(rois)-1)):
 	# Get two ROIs
 	start = rois[r]
 	end = rois[r+1]
-	
+
 	# Get Z or T positions defined by the position of the ROIs
 	if start.getTPosition() == 0:
 		z_start = start.getZPosition()
@@ -41,7 +41,7 @@ for j, r in enumerate(range(len(rois)-1)):
 		z_start = start.getTPosition()
 		z_end = end.getTPosition()
 
- 
+
 	# Get X positions
 	x_start = start.getContainedPoints()[0].x
 	x_end = end.getContainedPoints()[0].x
@@ -57,7 +57,7 @@ for j, r in enumerate(range(len(rois)-1)):
 	# Iterate over each frame in Z/T
 	for i, z in enumerate(range(z_start, z_end)):
 
-		ij.log().info("Processing frame %i/%i for roi #%i" % (i + 1, z_end - z_start, j))
+		print("Processing frame %i/%i for roi #%i" % (i + 1, z_end - z_start, j))
 
 		# Compute the translation
 		dx = int(x_shift + total_x_shift) * -1
@@ -74,12 +74,12 @@ for j, r in enumerate(range(len(rois)-1)):
 		padded_frame = ops.run("transform.extendZeroView", single_frame)
 
 		# Do the translation
-		translated_frame = ops.transform().translateView(padded_frame, [dx, dy, 0])
+		translated_frame = ops.transform().translateView(padded_frame, [dx, dy])
 
 		# Cleanup
 		translated_frame = Views.interval(translated_frame, intervals)
 		translated_frame = ops.run("transform.dropSingletonDimensionsView", translated_frame)
-	
+
 		images.append(translated_frame)
 
 images = ops.run("transform.stackView", [images])
