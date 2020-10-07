@@ -113,7 +113,7 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Travis CI</system>
-		<url>https://travis-ci.com/fiji/Kappa</url>
+		<url>https://travis-ci.com/fiji/Hadim_Scripts</url>
 	</ciManagement>
 
 	<repositories>
