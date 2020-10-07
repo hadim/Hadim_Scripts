@@ -1,5 +1,5 @@
 # Fiji Scripts
-[![Build Status](https://travis-ci.org/hadim/Hadim_Scripts.svg?branch=master)](https://travis-ci.org/hadim/Hadim_Scripts)
+[![Build Status](https://travis-ci.com/hadim/Hadim_Scripts.svg?branch=master)](https://travis-ci.com/hadim/Hadim_Scripts)
 
 A set of scripts and small plugins for Fiji.
 
